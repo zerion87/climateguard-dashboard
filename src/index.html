@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Temperaturkarte mit Zeitreise</title>
+    <link rel="stylesheet" href="leaflet/leaflet.css" />
+    <script src="leaflet/leaflet.js"></script>
+    <link rel="stylesheet" href="leaflet/MarkerCluster.css" />
+    <link rel="stylesheet" href="leaflet/MarkerCluster.Default.css" />
+    <script src="leaflet/leaflet.markercluster.js"></script>
+    <script src="leaflet/leaflet-heat.js"></script>
+    <script src="config.js"></script>
+    <style>
+        #map {
+            height: 500px;
+        }
+
+        #time-slider-container {
+            margin: 10px;
+            text-align: center;
+        }
+
+        .custom-temp-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: black;
+            text-align: center;
+        }
+
+        #time-slider-container {
+            margin: 10px;
+            text-align: center;
+        }
+
+        #time-slider {
+            -webkit-appearance: none;
+            /* Standard-Styling entfernen */
+            width: 80%;
+            /* Breiter */
+            height: 10px;
+            /* Dickere Leiste */
+            background: #ddd;
+            /* Leistenfarbe */
+            border-radius: 5px;
+            outline: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        #time-slider:hover {
+            opacity: 1;
+        }
+
+        #time-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            /* Größere Schiebetaste */
+            height: 20px;
+            background: #007bff;
+            /* Blaue Farbe für Thumb */
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        #time-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #007bff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Temperatur-Sensorkarte mit Zeitreise</h1>
+    <div id="map"></div>
+
+    <div id="time-slider-container">
+        <input type="range" id="time-slider" min="0" max="143" step="1" value="143">
+        <p>Gewählter Zeitpunkt: <span id="selected-time">Jetzt</span></p>
+    </div>
+
+    <script>
+        const influxUrl = CONFIG.INFLUXDB_URL;
+        const token = CONFIG.INFLUXDB_TOKEN;
+        var map = L.map('map').setView([51.1657, 10.4515], 6);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        let markers = L.markerClusterGroup();
+        let heatmapLayer = L.heatLayer([], { radius: 25, blur: 5, maxZoom: 10 }).addTo(map);
+        map.addLayer(markers);
+
+        let sensorData = {};
+        let timeStamps = []; // Speichert alle Zeitstempel für den Slider
+        let timeSlider = document.getElementById("time-slider");
+        let timeDisplay = document.getElementById("selected-time");
+
+        const sensors = {
+            "heltec2": { "lat": 49.440082, "lon": 10.942592, "name": "heltec2 Sensor" },
+            "lora3": { "lat": 49.440754, "lon": 10.942086, "name": "lora3 Sensor" }
+        };
+
+        function normalizeTemperature(temp, minTemp = -10, maxTemp = 40) {
+            return Math.max(0, Math.min(1, (temp - minTemp) / (maxTemp - minTemp)));
+        }
+
+        function getTrendArrow(previous, current) {
+            let prevRounded = Math.round(previous);
+            let currentRounded = Math.round(current);
+
+            if (currentRounded > prevRounded) return "🔼";
+            if (currentRounded < prevRounded) return "🔽";
+            return "➖";
+        }
+
+        function addClusteredMarker(lat, lon, temp, name, trend) {
+            let roundedTemp = Math.round(temp);
+            let tempLabel = L.divIcon({
+                className: 'custom-temp-label',
+                html: `<div style="font-size: 14px; font-weight: bold;">${roundedTemp}°C ${trend}</div>`,
+                iconSize: [40, 20],
+                iconAnchor: [20, 10]
+            });
+
+            let marker = L.marker([lat, lon], { icon: tempLabel });
+            markers.addLayer(marker);
+        }
+
+        async function loadTemperatureData() {
+
+            const bucket = "climateguard";
+
+            const query = `
+                from(bucket: "${bucket}")
+                    |> range(start: -24h)
+                    |> filter(fn: (r) => r["_measurement"] == "heltec2" or r["_measurement"] == "lora3")
+                    |> filter(fn: (r) => r["_field"] == "temperature")
+                    |> aggregateWindow(every: 10m, fn: last, createEmpty: false)
+                    |> yield()
+            `;
+
+            try {
+                const response = await fetch(influxUrl, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Token ${token}`,
+                        "Content-Type": "application/vnd.flux",
+                        "Accept": "application/csv"
+                    },
+                    body: query
+                });
+
+                if (!response.ok) {
+                    console.error("Fehler beim Abrufen der InfluxDB-Daten", await response.text());
+                    return;
+                }
+
+                const csvText = await response.text();
+                console.log("Raw CSV Data:", csvText);
+                const dataRows = csvText.split("\n").slice(1);
+
+                sensorData = {};
+                timeStamps = []; // Alle Zeitstempel speichern
+
+                dataRows.forEach(row => {
+                    const cols = row.split(",");
+                    if (cols.length < 9) return;
+
+                    const sensorId = cols[8];
+                    let temperature = parseFloat(cols[6]);
+                    const timestamp = new Date(cols[5]).toISOString();
+
+                    if (!sensorData[sensorId]) sensorData[sensorId] = [];
+                    sensorData[sensorId].push({ timestamp, temperature });
+
+                    if (!timeStamps.includes(timestamp)) timeStamps.push(timestamp);
+                });
+
+                timeStamps.sort(); // Stelle sicher, dass sie chronologisch sind
+                timeSlider.max = timeStamps.length - 1;
+                timeSlider.value = timeSlider.max;
+
+                updateMap(timeSlider.value);
+            } catch (error) {
+                console.error("Fehler beim Abrufen der Daten:", error);
+            }
+        }
+
+        function updateMap(timeIndex) {
+            markers.clearLayers();
+            heatmapLayer.setLatLngs([]);
+
+            let selectedTimestamp = timeStamps[timeIndex];
+            timeDisplay.innerText = new Date(selectedTimestamp).toLocaleString();
+
+            Object.keys(sensorData).forEach(sensorId => {
+                let readings = sensorData[sensorId];
+
+                let selectedReading = readings.find(r => r.timestamp === selectedTimestamp);
+                if (!selectedReading) return;
+
+                let prevReadingIndex = Math.max(0, readings.findIndex(r => r.timestamp === selectedTimestamp) - 1);
+                let prevReading = readings[prevReadingIndex];
+
+                let trend = prevReading ? getTrendArrow(prevReading.temperature, selectedReading.temperature) : "➖";
+
+                if (sensors[sensorId]) {
+                    addClusteredMarker(sensors[sensorId].lat, sensors[sensorId].lon, selectedReading.temperature, sensors[sensorId].name, trend);
+                    heatmapLayer.addLatLng([sensors[sensorId].lat, sensors[sensorId].lon, normalizeTemperature(selectedReading.temperature)]);
+                }
+            });
+        }
+
+        timeSlider.addEventListener("input", () => updateMap(timeSlider.value));
+
+        loadTemperatureData();
+        setInterval(loadTemperatureData, 30000);
+    </script>
+
+</body>
+
+</html>
