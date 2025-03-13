@@ -128,6 +128,7 @@
         let timeStamps = []; // Speichert alle Zeitstempel für den Slider
         let timeSlider = document.getElementById("time-slider");
         let timeDisplay = document.getElementById("selected-time");
+        let firstLoad = true; // Merkt sich, ob die Karte zum ersten Mal geladen wird
 
         const sensors = {
             "heltec2": { "lat": 49.440082, "lon": 10.942592, "name": "heltec2 Sensor" },
@@ -243,42 +244,41 @@
         }
 
         function updateMap(timeIndex) {
-            markers.clearLayers();
-            heatmapLayer.setLatLngs([]);
+    markers.clearLayers();
+    heatmapLayer.setLatLngs([]);
 
-            let selectedTimestamp = timeStamps[timeIndex];
-            timeDisplay.innerText = new Date(selectedTimestamp).toLocaleString();
+    let selectedTimestamp = timeStamps[timeIndex];
+    timeDisplay.innerText = new Date(selectedTimestamp).toLocaleString();
 
-            Object.keys(sensorData).forEach(sensorId => {
-                let readings = sensorData[sensorId];
+    let bounds = new L.LatLngBounds(); // Speichert Sensorpositionen
 
-                // Finde den richtigen Zeitwert für den gewählten Zeitpunkt
-                let selectedReading = readings.find(r => r.timestamp === selectedTimestamp);
-                if (!selectedReading) return;
+    Object.keys(sensorData).forEach(sensorId => {
+        let readings = sensorData[sensorId];
 
-                let prevReadingIndex = Math.max(0, readings.findIndex(r => r.timestamp === selectedTimestamp) - 1);
-                let prevReading = readings[prevReadingIndex];
+        let selectedReading = readings.find(r => r.timestamp === selectedTimestamp);
+        if (!selectedReading) return;
 
-                let trend = prevReading ? getTrendArrow(prevReading.temperature, selectedReading.temperature) : "➖";
+        let prevReadingIndex = Math.max(0, readings.findIndex(r => r.timestamp === selectedTimestamp) - 1);
+        let prevReading = readings[prevReadingIndex];
 
-                if (sensors[sensorId]) {
-                    // Debugging: Logge Werte, um zu sehen, ob sie korrekt sind
-                    console.log(`Sensor: ${sensorId}, Temperatur: ${selectedReading.temperature}, Zeit: ${selectedReading.timestamp}`);
+        let trend = prevReading ? getTrendArrow(prevReading.temperature, selectedReading.temperature) : "➖";
 
-                    addClusteredMarker(
-                        sensors[sensorId].lat,
-                        sensors[sensorId].lon,
-                        selectedReading.temperature,
-                        sensors[sensorId].name,
-                        trend,
-                        sensorId, // Sensor-ID richtig übergeben
-                        selectedReading.timestamp // Korrekte Zeit übergeben
-                    );
+        if (sensors[sensorId]) {
+            let lat = sensors[sensorId].lat;
+            let lon = sensors[sensorId].lon;
+            bounds.extend([lat, lon]);
 
-                    heatmapLayer.addLatLng([sensors[sensorId].lat, sensors[sensorId].lon, normalizeTemperature(selectedReading.temperature)]);
-                }
-            });
+            addClusteredMarker(lat, lon, selectedReading.temperature, sensors[sensorId].name, trend, sensorId, selectedReading.timestamp);
+            heatmapLayer.addLatLng([lat, lon, normalizeTemperature(selectedReading.temperature)]);
         }
+    });
+
+    // Nur beim ersten Laden zoomen, aber nur wenn `bounds` gültig ist
+    if (firstLoad && Object.keys(sensorData).length > 0 && bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [50, 50] });
+        firstLoad = false;
+    }
+}
 
         timeSlider.addEventListener("input", () => updateMap(timeSlider.value));
 
