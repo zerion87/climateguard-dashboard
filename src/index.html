@@ -110,18 +110,18 @@
 
         let markers = L.markerClusterGroup();
         let heatmapLayer = L.heatLayer([], {
-    radius: 25,
-    blur: 5,
-    maxZoom: 10,
-    gradient: {
-        0.0: "blue",    // Sehr kalt (-10°C)
-        0.2: "cyan",    // Kalt (0°C)
-        0.4: "lime",    // Mäßig warm (15°C)
-        0.6: "yellow",  // Warm (25°C)
-        0.8: "orange",  // Heiß (30°C)
-        1.0: "red"      // Sehr heiß (40°C+)
-    }
-}).addTo(map);
+            radius: 25,
+            blur: 5,
+            maxZoom: 10,
+            gradient: {
+                0.0: "blue",    // Sehr kalt (-10°C)
+                0.2: "cyan",    // Kalt (0°C)
+                0.4: "lime",    // Mäßig warm (15°C)
+                0.6: "yellow",  // Warm (25°C)
+                0.8: "orange",  // Heiß (30°C)
+                1.0: "red"      // Sehr heiß (40°C+)
+            }
+        }).addTo(map);
         map.addLayer(markers);
 
         let sensorData = {};
@@ -147,7 +147,7 @@
             return "➖";
         }
 
-        function addClusteredMarker(lat, lon, temp, name, trend) {
+        function addClusteredMarker(lat, lon, temp, name, trend, sensorId, timestamp) {
             let roundedTemp = Math.round(temp);
             let tempLabel = L.divIcon({
                 className: 'custom-temp-label',
@@ -157,8 +157,30 @@
             });
 
             let marker = L.marker([lat, lon], { icon: tempLabel });
+
+            // Falls der Timestamp noch nicht korrekt ist, versuchen wir, ihn zu fixen
+            let dateTime = new Date(timestamp);
+            if (isNaN(dateTime.getTime())) {
+                console.warn("Ungültiges Datum gefunden:", timestamp);
+                dateTime = "Zeit unbekannt";
+            } else {
+                dateTime = dateTime.toLocaleString();
+            }
+
+            // Füge Tooltip mit Sensor-ID, Temperatur und Messzeit hinzu
+            marker.bindTooltip(`
+        <b>Sensor:</b> ${sensorId || "Unbekannt"}<br>
+        <b>Temperatur:</b> ${roundedTemp}°C<br>
+        <b>Messzeit:</b> ${dateTime}
+    `, {
+                permanent: false,
+                direction: "top",
+                offset: [0, -10]
+            });
+
             markers.addLayer(marker);
         }
+
 
         async function loadTemperatureData() {
 
@@ -230,6 +252,7 @@
             Object.keys(sensorData).forEach(sensorId => {
                 let readings = sensorData[sensorId];
 
+                // Finde den richtigen Zeitwert für den gewählten Zeitpunkt
                 let selectedReading = readings.find(r => r.timestamp === selectedTimestamp);
                 if (!selectedReading) return;
 
@@ -239,7 +262,19 @@
                 let trend = prevReading ? getTrendArrow(prevReading.temperature, selectedReading.temperature) : "➖";
 
                 if (sensors[sensorId]) {
-                    addClusteredMarker(sensors[sensorId].lat, sensors[sensorId].lon, selectedReading.temperature, sensors[sensorId].name, trend);
+                    // Debugging: Logge Werte, um zu sehen, ob sie korrekt sind
+                    console.log(`Sensor: ${sensorId}, Temperatur: ${selectedReading.temperature}, Zeit: ${selectedReading.timestamp}`);
+
+                    addClusteredMarker(
+                        sensors[sensorId].lat,
+                        sensors[sensorId].lon,
+                        selectedReading.temperature,
+                        sensors[sensorId].name,
+                        trend,
+                        sensorId, // Sensor-ID richtig übergeben
+                        selectedReading.timestamp // Korrekte Zeit übergeben
+                    );
+
                     heatmapLayer.addLatLng([sensors[sensorId].lat, sensors[sensorId].lon, normalizeTemperature(selectedReading.temperature)]);
                 }
             });
@@ -255,21 +290,21 @@
             var legend = L.control({ position: "bottomright" });
 
             legend.onAdd = function (map) {
-    var div = L.DomUtil.create("div", "info legend");
-    div.innerHTML += "<h4>Temperatur (°C)</h4>";
-    
-    var grades = [-10, 0, 15, 25, 30, 40];
-    var colors = ["blue", "cyan", "lime", "yellow", "orange", "red"];
+                var div = L.DomUtil.create("div", "info legend");
+                div.innerHTML += "<h4>Temperatur (°C)</h4>";
 
-    for (var i = 0; i < grades.length; i++) {
-        div.innerHTML +=
-            '<i style="background:' + colors[i] + '; width: 20px; height: 20px; display: inline-block; margin-right: 5px;"></i> ' +
-            grades[i] + (grades[i + 1] ? "&ndash;" + grades[i + 1] + "°C" : "+ °C") +
-            "<br>";  // <--- HIER WIRD DER ZEILENUMBRUCH ERZWUNGEN
-    }
+                var grades = [-10, 0, 15, 25, 30, 40];
+                var colors = ["blue", "cyan", "lime", "yellow", "orange", "red"];
 
-    return div;
-};
+                for (var i = 0; i < grades.length; i++) {
+                    div.innerHTML +=
+                        '<i style="background:' + colors[i] + '; width: 20px; height: 20px; display: inline-block; margin-right: 5px;"></i> ' +
+                        grades[i] + (grades[i + 1] ? "&ndash;" + grades[i + 1] + "°C" : "+ °C") +
+                        "<br>";  // <--- HIER WIRD DER ZEILENUMBRUCH ERZWUNGEN
+                }
+
+                return div;
+            };
 
             legend.addTo(map);
         }
