@@ -72,6 +72,20 @@
             border-radius: 50%;
             cursor: pointer;
         }
+
+        .info.legend {
+            background: white;
+            padding: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .info.legend h4 {
+            margin: 0 0 5px;
+            font-size: 16px;
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -95,7 +109,19 @@
         }).addTo(map);
 
         let markers = L.markerClusterGroup();
-        let heatmapLayer = L.heatLayer([], { radius: 25, blur: 5, maxZoom: 10 }).addTo(map);
+        let heatmapLayer = L.heatLayer([], {
+    radius: 25,
+    blur: 5,
+    maxZoom: 10,
+    gradient: {
+        0.0: "blue",    // Sehr kalt (-10°C)
+        0.2: "cyan",    // Kalt (0°C)
+        0.4: "lime",    // Mäßig warm (15°C)
+        0.6: "yellow",  // Warm (25°C)
+        0.8: "orange",  // Heiß (30°C)
+        1.0: "red"      // Sehr heiß (40°C+)
+    }
+}).addTo(map);
         map.addLayer(markers);
 
         let sensorData = {};
@@ -223,6 +249,33 @@
 
         loadTemperatureData();
         setInterval(loadTemperatureData, 30000);
+
+        // Funktion zum Erstellen der Heatmap-Legende
+        function addLegend() {
+            var legend = L.control({ position: "bottomright" });
+
+            legend.onAdd = function (map) {
+    var div = L.DomUtil.create("div", "info legend");
+    div.innerHTML += "<h4>Temperatur (°C)</h4>";
+    
+    var grades = [-10, 0, 15, 25, 30, 40];
+    var colors = ["blue", "cyan", "lime", "yellow", "orange", "red"];
+
+    for (var i = 0; i < grades.length; i++) {
+        div.innerHTML +=
+            '<i style="background:' + colors[i] + '; width: 20px; height: 20px; display: inline-block; margin-right: 5px;"></i> ' +
+            grades[i] + (grades[i + 1] ? "&ndash;" + grades[i + 1] + "°C" : "+ °C") +
+            "<br>";  // <--- HIER WIRD DER ZEILENUMBRUCH ERZWUNGEN
+    }
+
+    return div;
+};
+
+            legend.addTo(map);
+        }
+
+        // Rufe die Funktion auf, um die Legende zu erstellen
+        addLegend();
     </script>
 
 </body>
