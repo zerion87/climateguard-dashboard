@@ -5,7 +5,8 @@
 This project visualizes temperature sensor data on an interactive map using the Leaflet library. The map displays clustered markers and heatmaps to represent temperature readings from various sensors. Users can explore temperature changes over the past 24 hours using a time slider, which updates the map in 10-minute intervals.
 
 ### Example:
-![alt text](example.png)
+![Example](example.png)
+
 
 ### Features
 
@@ -13,6 +14,8 @@ This project visualizes temperature sensor data on an interactive map using the 
 - **Time Slider**: Allows users to view temperature data at different times over the past 24 hours.
 - **Real-time Updates**: The map and data are updated every 30 seconds to provide the latest temperature readings.
 - **Temperature Trends**: Shows whether the temperature has increased, decreased, or remained the same with trend arrows.
+- **Tooltip**: Show Temperature, Sensor ID and Timestamp in a Tooltip
+- **Autozoom**: Zoom in to the lowest level with all available Sensors
 
 ### Technologies Used
 
