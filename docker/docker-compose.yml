@@ -6,4 +6,5 @@ services:
     container_name: the_floor_is_lava
     restart: always
     ports:
-      - "8000:80"
+      - "80:80"
+      - "443:443"
