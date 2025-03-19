@@ -12,6 +12,7 @@
     <script src="leaflet/leaflet.markercluster.js"></script>
     <script src="leaflet/leaflet-heat.js"></script>
     <script src="config.js"></script>
+
     <style>
         #map {
             height: 500px;
@@ -29,20 +30,11 @@
             text-align: center;
         }
 
-        #time-slider-container {
-            margin: 10px;
-            text-align: center;
-        }
-
         #time-slider {
             -webkit-appearance: none;
-            /* Standard-Styling entfernen */
             width: 80%;
-            /* Breiter */
             height: 10px;
-            /* Dickere Leiste */
             background: #ddd;
-            /* Leistenfarbe */
             border-radius: 5px;
             outline: none;
             opacity: 0.9;
@@ -55,17 +47,6 @@
 
         #time-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            /* Größere Schiebetaste */
-            height: 20px;
-            background: #007bff;
-            /* Blaue Farbe für Thumb */
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        #time-slider::-moz-range-thumb {
             width: 20px;
             height: 20px;
             background: #007bff;
@@ -100,8 +81,6 @@
     </div>
 
     <script>
-        const influxUrl = CONFIG.INFLUXDB_URL;
-        const token = CONFIG.INFLUXDB_TOKEN;
         var map = L.map('map').setView([51.1657, 10.4515], 6);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -114,25 +93,25 @@
             blur: 5,
             maxZoom: 10,
             gradient: {
-                0.0: "blue",    // Sehr kalt (-10°C)
-                0.2: "cyan",    // Kalt (0°C)
-                0.4: "lime",    // Mäßig warm (15°C)
-                0.6: "yellow",  // Warm (25°C)
-                0.8: "orange",  // Heiß (30°C)
-                1.0: "red"      // Sehr heiß (40°C+)
+                0.0: "blue",
+                0.2: "cyan",
+                0.4: "lime",
+                0.6: "yellow",
+                0.8: "orange",
+                1.0: "red"
             }
         }).addTo(map);
         map.addLayer(markers);
 
         let sensorData = {};
-        let timeStamps = []; // Speichert alle Zeitstempel für den Slider
+        let timeStamps = [];
         let timeSlider = document.getElementById("time-slider");
         let timeDisplay = document.getElementById("selected-time");
-        let firstLoad = true; // Merkt sich, ob die Karte zum ersten Mal geladen wird
+        let firstLoad = true;
 
         const sensors = {
-            "heltec2": { "lat": 49.440082, "lon": 10.942592, "name": "heltec2 Sensor" },
-            "lora3": { "lat": 49.440754, "lon": 10.942086, "name": "lora3 Sensor" }
+            "lora3": { "lat": 49.440754, "lon": 10.942086, "name": "Lora3 Sensor" },
+            "andis-sensor-an-heltech": { "lat": 49.441000, "lon": 10.941500, "name": "Andis Sensor" }
         };
 
         function normalizeTemperature(temp, minTemp = -10, maxTemp = 40) {
@@ -150,82 +129,35 @@
 
         function addClusteredMarker(lat, lon, temp, name, trend, sensorId, timestamp) {
             let roundedTemp = Math.round(temp);
-            let tempLabel = L.divIcon({
-                className: 'custom-temp-label',
-                html: `<div style="font-size: 14px; font-weight: bold;">${roundedTemp}°C ${trend}</div>`,
-                iconSize: [40, 20],
-                iconAnchor: [20, 10]
-            });
-
-            let marker = L.marker([lat, lon], { icon: tempLabel });
-
-            // Falls der Timestamp noch nicht korrekt ist, versuchen wir, ihn zu fixen
-            let dateTime = new Date(timestamp);
-            if (isNaN(dateTime.getTime())) {
-                console.warn("Ungültiges Datum gefunden:", timestamp);
-                dateTime = "Zeit unbekannt";
-            } else {
-                dateTime = dateTime.toLocaleString();
-            }
-
-            // Füge Tooltip mit Sensor-ID, Temperatur und Messzeit hinzu
-            marker.bindTooltip(`
-        <b>Sensor:</b> ${sensorId || "Unbekannt"}<br>
-        <b>Temperatur:</b> ${roundedTemp}°C<br>
-        <b>Messzeit:</b> ${dateTime}
-    `, {
-                permanent: false,
-                direction: "top",
-                offset: [0, -10]
-            });
+            let marker = L.marker([lat, lon]).bindTooltip(`
+                <b>Sensor:</b> ${sensorId}<br>
+                <b>Temperatur:</b> ${roundedTemp}°C<br>
+                <b>Messzeit:</b> ${new Date(timestamp * 1000).toLocaleString()}
+            `, { permanent: false, direction: "top", offset: [0, -10] });
 
             markers.addLayer(marker);
         }
 
-
         async function loadTemperatureData() {
-
-            const bucket = "climateguard";
-
-            const query = `
-                from(bucket: "${bucket}")
-                    |> range(start: -24h)
-                    |> filter(fn: (r) => r["_measurement"] == "heltec2" or r["_measurement"] == "lora3")
-                    |> filter(fn: (r) => r["_field"] == "temperature")
-                    |> aggregateWindow(every: 10m, fn: last, createEmpty: false)
-                    |> yield()
-            `;
-
+            const apiUrl = "https://api.quantum.hackerban.de/sensormetrics";
             try {
-                const response = await fetch(influxUrl, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Token ${token}`,
-                        "Content-Type": "application/vnd.flux",
-                        "Accept": "application/csv"
-                    },
-                    body: query
-                });
+                const response = await fetch(apiUrl);
 
                 if (!response.ok) {
-                    console.error("Fehler beim Abrufen der InfluxDB-Daten", await response.text());
+                    console.error("Fehler beim Abrufen der Sensordaten:", await response.text());
                     return;
                 }
 
-                const csvText = await response.text();
-                console.log("Raw CSV Data:", csvText);
-                const dataRows = csvText.split("\n").slice(1);
+                const jsonData = await response.json();
+                console.log("Empfangene Sensordaten:", jsonData);
 
                 sensorData = {};
-                timeStamps = []; // Alle Zeitstempel speichern
+                timeStamps = [];
 
-                dataRows.forEach(row => {
-                    const cols = row.split(",");
-                    if (cols.length < 9) return;
-
-                    const sensorId = cols[8];
-                    let temperature = parseFloat(cols[6]);
-                    const timestamp = new Date(cols[5]).toISOString();
+                jsonData.forEach(entry => {
+                    const sensorId = entry.sensor_id;
+                    const temperature = parseFloat(entry.temperature);
+                    const timestamp = entry.timestamp_server;
 
                     if (!sensorData[sensorId]) sensorData[sensorId] = [];
                     sensorData[sensorId].push({ timestamp, temperature });
@@ -233,7 +165,7 @@
                     if (!timeStamps.includes(timestamp)) timeStamps.push(timestamp);
                 });
 
-                timeStamps.sort(); // Stelle sicher, dass sie chronologisch sind
+                timeStamps.sort();
                 timeSlider.max = timeStamps.length - 1;
                 timeSlider.value = timeSlider.max;
 
@@ -244,73 +176,45 @@
         }
 
         function updateMap(timeIndex) {
-    markers.clearLayers();
-    heatmapLayer.setLatLngs([]);
+            markers.clearLayers();
+            heatmapLayer.setLatLngs([]);
 
-    let selectedTimestamp = timeStamps[timeIndex];
-    timeDisplay.innerText = new Date(selectedTimestamp).toLocaleString();
+            let selectedTimestamp = timeStamps[timeIndex];
+            timeDisplay.innerText = new Date(selectedTimestamp * 1000).toLocaleString();
 
-    let bounds = new L.LatLngBounds(); // Speichert Sensorpositionen
+            let bounds = new L.LatLngBounds();
 
-    Object.keys(sensorData).forEach(sensorId => {
-        let readings = sensorData[sensorId];
+            Object.keys(sensorData).forEach(sensorId => {
+                let readings = sensorData[sensorId];
 
-        let selectedReading = readings.find(r => r.timestamp === selectedTimestamp);
-        if (!selectedReading) return;
+                let selectedReading = readings.find(r => r.timestamp === selectedTimestamp);
+                if (!selectedReading) return;
 
-        let prevReadingIndex = Math.max(0, readings.findIndex(r => r.timestamp === selectedTimestamp) - 1);
-        let prevReading = readings[prevReadingIndex];
+                let prevReadingIndex = Math.max(0, readings.findIndex(r => r.timestamp === selectedTimestamp) - 1);
+                let prevReading = readings[prevReadingIndex];
 
-        let trend = prevReading ? getTrendArrow(prevReading.temperature, selectedReading.temperature) : "➖";
+                let trend = prevReading ? getTrendArrow(prevReading.temperature, selectedReading.temperature) : "➖";
 
-        if (sensors[sensorId]) {
-            let lat = sensors[sensorId].lat;
-            let lon = sensors[sensorId].lon;
-            bounds.extend([lat, lon]);
+                if (sensors[sensorId]) {
+                    let lat = sensors[sensorId].lat;
+                    let lon = sensors[sensorId].lon;
+                    bounds.extend([lat, lon]);
 
-            addClusteredMarker(lat, lon, selectedReading.temperature, sensors[sensorId].name, trend, sensorId, selectedReading.timestamp);
-            heatmapLayer.addLatLng([lat, lon, normalizeTemperature(selectedReading.temperature)]);
+                    addClusteredMarker(lat, lon, selectedReading.temperature, sensors[sensorId].name, trend, sensorId, selectedReading.timestamp);
+                    heatmapLayer.addLatLng([lat, lon, normalizeTemperature(selectedReading.temperature)]);
+                }
+            });
+
+            if (firstLoad && Object.keys(sensorData).length > 0) {
+                map.fitBounds(bounds, { padding: [50, 50] });
+                firstLoad = false;
+            }
         }
-    });
-
-    // Nur beim ersten Laden zoomen, aber nur wenn `bounds` gültig ist
-    if (firstLoad && Object.keys(sensorData).length > 0 && bounds.isValid()) {
-        map.fitBounds(bounds, { padding: [50, 50] });
-        firstLoad = false;
-    }
-}
 
         timeSlider.addEventListener("input", () => updateMap(timeSlider.value));
 
         loadTemperatureData();
         setInterval(loadTemperatureData, 30000);
-
-        // Funktion zum Erstellen der Heatmap-Legende
-        function addLegend() {
-            var legend = L.control({ position: "bottomright" });
-
-            legend.onAdd = function (map) {
-                var div = L.DomUtil.create("div", "info legend");
-                div.innerHTML += "<h4>Temperatur (°C)</h4>";
-
-                var grades = [-10, 0, 15, 25, 30, 40];
-                var colors = ["blue", "cyan", "lime", "yellow", "orange", "red"];
-
-                for (var i = 0; i < grades.length; i++) {
-                    div.innerHTML +=
-                        '<i style="background:' + colors[i] + '; width: 20px; height: 20px; display: inline-block; margin-right: 5px;"></i> ' +
-                        grades[i] + (grades[i + 1] ? "&ndash;" + grades[i + 1] + "°C" : "+ °C") +
-                        "<br>";  // <--- HIER WIRD DER ZEILENUMBRUCH ERZWUNGEN
-                }
-
-                return div;
-            };
-
-            legend.addTo(map);
-        }
-
-        // Rufe die Funktion auf, um die Legende zu erstellen
-        addLegend();
     </script>
 
 </body>

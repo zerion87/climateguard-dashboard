@@ -1,0 +1,19 @@
+name: the_floor_is_lava stage deployment
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: quantum_server
+    concurrency:
+      group: run_stage
+      cancel-in-progress: true
+
+    steps:
+      - name: Build and Run Docker image
+        run: |
+          docker compose -p  -f ./docker/docker-compose.yml up -d --build
