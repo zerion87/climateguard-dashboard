@@ -128,11 +128,21 @@
 
         function addClusteredMarker(lat, lon, temp, name, trend, sensorId, timestamp) {
             let roundedTemp = Math.round(temp);
-            let marker = L.marker([lat, lon]).bindTooltip(`
-                <b>Sensor:</b> ${sensorId}<br>
-                <b>Temperatur:</b> ${roundedTemp}°C<br>
-                <b>Messzeit:</b> ${new Date(timestamp * 1000).toLocaleString()}
-            `, { permanent: false, direction: "top", offset: [0, -10] });
+
+            let tempLabel = L.divIcon({
+                className: 'custom-temp-label',
+                html: `<div style="font-size: 14px; font-weight: bold;">${roundedTemp}°C ${trend}</div>`,
+                iconSize: [40, 20],
+                iconAnchor: [20, 10]
+            });
+
+            let marker = L.marker([lat, lon], { icon: tempLabel });
+
+            marker.bindTooltip(`
+        <b>Sensor:</b> ${sensorId}<br>
+        <b>Temperatur:</b> ${roundedTemp}°C<br>
+        <b>Messzeit:</b> ${new Date(timestamp * 1000).toLocaleString()}
+    `, { permanent: false, direction: "top", offset: [0, -10] });
 
             markers.addLayer(marker);
         }
@@ -186,7 +196,7 @@
             Object.keys(sensorData).forEach(sensorId => {
                 let readings = sensorData[sensorId];
 
-                let selectedReading = readings.find(r => r.timestamp === selectedTimestamp);
+                let selectedReading = [...readings].reverse().find(r => r.timestamp <= selectedTimestamp);
                 if (!selectedReading) return;
 
                 let prevReadingIndex = Math.max(0, readings.findIndex(r => r.timestamp === selectedTimestamp) - 1);
