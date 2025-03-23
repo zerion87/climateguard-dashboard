@@ -11,8 +11,6 @@
     <link rel="stylesheet" href="leaflet/MarkerCluster.Default.css" />
     <script src="leaflet/leaflet.markercluster.js"></script>
     <script src="leaflet/leaflet-heat.js"></script>
-    <script src="config.js"></script>
-
     <style>
         #map {
             height: 500px;
@@ -32,6 +30,7 @@
 
         #time-slider {
             -webkit-appearance: none;
+            appearance: none;
             width: 80%;
             height: 10px;
             background: #ddd;
@@ -155,7 +154,7 @@
                 timeStamps = [];
 
                 jsonData.forEach(entry => {
-                    const sensorId = entry.sensor_id;
+                    const sensorId = entry.device_id;
                     const temperature = parseFloat(entry.temperature);
                     const timestamp = entry.timestamp_server;
 
