@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ title }} | TempMap</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/styles/main.css" />
+  </head>
+
+  <body>
+    <header class="topbar">
+      <div class="container">
+        <a class="logo" href="/">
+          <span class="logo-icon">🌡️</span>
+          <span class="logo-text">Climate<span class="sub">.Guard by Hackerban.de</span></span>
+        </a>
+
+<nav class="main-nav">
+  <a href="/" class="{% if page.url == '/' %}active{% endif %}">Start</a>
+  <a href="/daten/" class="{% if page.url.startsWith('/daten/') %}active{% endif %}">Daten</a>
+  <a href="/projekt/" class="{% if page.url.startsWith('/projekt/') %}active{% endif %}">Über das Projekt</a>
+  <a href="/mitmachen/" class="{% if page.url.startsWith('/mitmachen/') %}active{% endif %}">Mitmachen ❤️</a>
+</nav>
+
+      </div>
+    </header>
+
+    <main>
+      {{ content | safe }}
+    </main>
+
+    <footer>
+      <p>© 2025 TempMap Community Projekt |
+        <a href="/impressum/">Impressum</a>
+      </p>
+    </footer>
+  </body>
+</html>
