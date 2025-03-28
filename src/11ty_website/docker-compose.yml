@@ -2,8 +2,8 @@ services:
   the_floor_is_lava:
     build:
       context: ..
-      dockerfile: docker/Dockerfile
-    container_name: the_floor_is_lava
+      dockerfile: src/11ty_website/Dockerfile
+    container_name: climatguard_11ty
     restart: always
     ports:
       - "8070:80"
