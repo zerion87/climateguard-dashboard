@@ -1,0 +1,10 @@
+services:
+  the_floor_is_lava:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: the_floor_is_lava
+    restart: always
+    ports:
+      - "8070:80"
+      - "7443:443"
