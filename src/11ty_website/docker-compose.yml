@@ -1,8 +1,8 @@
 services:
-  the_floor_is_lava:
+  climatguard_11ty:
     build:
-      context: ..
-      dockerfile: src/11ty_website/Dockerfile
+      context: .
+      dockerfile: Dockerfile
     container_name: climatguard_11ty
     restart: always
     ports:
