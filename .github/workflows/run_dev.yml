@@ -1,0 +1,22 @@
+name: climateguard stage deployment
+
+on:
+  push:
+    branches:
+      - website_11ty
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: quantum_server
+    concurrency:
+      group: run_stage
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Build and Run Docker image
+        run: |
+          docker compose -f src/11ty_website/docker-compose.yml up -d --build
