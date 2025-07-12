@@ -102,6 +102,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function updateMap(timeIndex) {
+            console.log("→ updateMap called with timeIndex:", timeIndex, typeof timeIndex);
+    console.log("   selectedTimestamp:", timeStamps[timeIndex]);
+    console.log("   sensorData keys:", Object.keys(sensorData));
         markers.clearLayers();
         heatmapLayer.setLatLngs([]);
 
