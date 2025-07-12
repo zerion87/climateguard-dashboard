@@ -102,53 +102,50 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function updateMap(timeIndex) {
-            console.log("→ updateMap called with timeIndex:", timeIndex, typeof timeIndex);
-    console.log("   selectedTimestamp:", timeStamps[timeIndex]);
-    console.log("   sensorData keys:", Object.keys(sensorData));
-        markers.clearLayers();
-        heatmapLayer.setLatLngs([]);
-
-        let selectedTimestamp = timeStamps[timeIndex];
-        timeDisplay.innerText = new Date(selectedTimestamp * 1000).toLocaleString();
-
-        let bounds = new L.LatLngBounds();
-
-        Object.keys(sensorData).forEach(sensorIdKey => {
-            const sensorId = Number(sensorIdKey);
-            const readings = sensorData[sensorId];
-            // Finde das letzte Reading bis zum ausgewählten Zeitstempel
-            const selectedReading = [...readings].reverse().find(r => r.timestamp <= selectedTimestamp);
-            if (!selectedReading) return;
-
-            // Vorheriges Reading für Trendpfeil
-            const idx = readings.findIndex(r => r.timestamp === selectedReading.timestamp);
-            const prevReading = idx > 0 ? readings[idx - 1] : null;
-            const trend = prevReading
-                ? getTrendArrow(prevReading.temperature, selectedReading.temperature)
-                : "➖";
-
-            // Nur anzeigen, wenn wir eine Position für diesen Sensor haben
-            if (sensors[sensorId]) {
-                const { lat, lon, name } = sensors[sensorId];
-                bounds.extend([lat, lon]);
-
-                addClusteredMarker(lat, lon,
-                                   selectedReading.temperature,
-                                   name, trend,
-                                   selectedReading.timestamp);
-
-                heatmapLayer.addLatLng([
-                    lat, lon,
-                    normalizeTemperature(selectedReading.temperature)
-                ]);
-            }
-        });
-
-        if (firstLoad && Object.keys(sensorData).length > 0) {
-            map.fitBounds(bounds, { padding: [50, 50] });
-            firstLoad = false;
-        }
+  console.clear();
+  console.log("→ updateMap called with timeIndex:", timeIndex, typeof timeIndex);
+  
+  const selectedTimestamp = timeStamps[timeIndex];
+  console.log("   selectedTimestamp:", selectedTimestamp);
+  console.log("   sensorData keys:", Object.keys(sensorData));
+  
+  markers.clearLayers();
+  heatmapLayer.setLatLngs([]);
+  
+  // überprüfe pro Sensor:
+  Object.keys(sensorData).forEach(sensorId => {
+    const readings = sensorData[sensorId];
+    const sel = [...readings]
+                   .reverse()
+                   .find(r => r.timestamp <= selectedTimestamp);
+    
+    console.group(`Sensor ${sensorId}`);
+    console.log("  readings count:", readings.length);
+    console.log("  sel.timestamp:", sel ? sel.timestamp : "<none>");
+    
+    if (!sensors[sensorId]) {
+      console.warn(`  ⚠️ kein Mapping für sensors[${sensorId}] gefunden`);
+    } else if (sel) {
+      const { lat, lon, name } = sensors[sensorId];
+      console.log(`  mapping found → ${name} @ (${lat},${lon})`);
+      
+      // und hier die eigentliche Hinzufügung:
+      addClusteredMarker(lat, lon, sel.temperature, name, "?", sensorId, sel.timestamp);
+      heatmapLayer.addLatLng([lat, lon, normalizeTemperature(sel.temperature)]);
     }
+    console.groupEnd();
+  });
+  
+  // wie viele Marker liegen jetzt im Cluster?
+  console.log("→ marker count:", markers.getLayers().length);
+  // und wie viele Heatmap-Punkte?
+  console.log("→ heatmap points:", heatmapLayer._latlngs?.length || heatmapLayer._latlngs?.length);
+  
+  if (firstLoad && Object.keys(sensorData).length > 0) {
+    map.fitBounds(new L.LatLngBounds(Object.values(sensors).map(s => [s.lat, s.lon])), { padding: [50,50] });
+    firstLoad = false;
+  }
+}
 
     //timeSlider.addEventListener("input", () => updateMap(timeSlider.value));
 
