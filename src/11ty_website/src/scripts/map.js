@@ -27,6 +27,8 @@ document.addEventListener("DOMContentLoaded", function () {
     let timeDisplay = document.getElementById("selected-time");
     let firstLoad = true;
 
+    timeSlider.min = 0;
+
     // Nun mit numerischen Device-IDs
     const sensors = {
         1: { lat: 49.440754, lon: 10.942086, name: "Lora3 Sensor" },
@@ -145,7 +147,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    timeSlider.addEventListener("input", () => updateMap(timeSlider.value));
+    //timeSlider.addEventListener("input", () => updateMap(timeSlider.value));
+
+    timeSlider.addEventListener("input", () => {
+    console.log("Slider moved, value =", timeSlider.value);
+    updateMap(timeSlider.value);
+    });
 
     loadTemperatureData();
     // alle 30 Sek. neu laden
