@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         async function loadTemperatureData() {
-            const apiUrl = "https://api.quantum.hackerban.de/v2/sensormetrics";
+            const apiUrl = "https://api.quantum.hackerban.de/v2/metrics";
             try {
                 const response = await fetch(apiUrl);
 
