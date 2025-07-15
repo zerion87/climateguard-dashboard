@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="de" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="NuernbergKlima – Bürgerportal zur Verbesserung des Stadtklimas in Nürnberg mit Echtzeitdaten, interaktiven Karten und Bürgerbeteiligung.">
+  <title>NuernbergKlima – Bürgerportal</title>
+
+  <!-- Leaflet CSS (Local) -->
+  <link rel="stylesheet" href="/leaflet/leaflet.css" />
+
+  <style>
+    /* --- Base & Variables --- */
+    :root {
+      --primary-light: #14A2AB;
+      --primary-dark:  #0B8AB8;
+      --text-dark: #1f2937; /* gray-800 */
+      --text-medium: #4b5563; /* gray-600 */
+      --text-light: #f9fafb; /* gray-50 */
+      --bg-light: #f9fafb; /* gray-50 */
+      --bg-white: #ffffff;
+      --bg-dark: #1f2937; /* gray-800 */
+    }
+
+    /* Local Poppins Fonts */
+    @font-face {
+      font-family: 'Poppins';
+      font-style: normal;
+      font-weight: 300;
+      src: url('/fonts/Poppins-Light.ttf') format('truetype');
+    }
+    @font-face {
+      font-family: 'Poppins';
+      font-style: normal;
+      font-weight: 400;
+      src: url('/fonts/Poppins-Regular.ttf') format('truetype');
+    }
+    @font-face {
+      font-family: 'Poppins';
+      font-style: normal;
+      font-weight: 600;
+      src: url('/fonts/Poppins-SemiBold.ttf') format('truetype');
+    }
+
+    /* --- General Styling --- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: var(--text-dark);
+      background-color: var(--bg-light);
+    }
+    .container {
+      max-width: 1280px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+    section {
+      padding-top: 3rem;
+      padding-bottom: 3rem;
+    }
+    h1 {
+      font-size: 2.25rem; /* 36px */
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+    h2 {
+      font-size: 1.875rem; /* 30px */
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+    p {
+      line-height: 1.6;
+    }
+
+    /* --- Header & Navigation --- */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background-color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    }
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 8rem; /* 128px, increased for larger logo */
+    }
+    .logo img {
+      height: 100px; /* Changed from 3rem */
+      width: auto;
+    }
+    .nav-desktop {
+      display: none; /* Hidden on mobile */
+    }
+    .nav-desktop a:not(.btn) {
+      color: var(--text-medium);
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      transition: color 0.2s, background-color 0.2s;
+    }
+    .nav-desktop a:not(.btn):hover {
+      color: var(--text-dark);
+      background-color: #f3f4f6;
+    }
+    .nav-desktop .btn { /* Contact button */
+      padding-left: 1rem;
+      padding-right: 1rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .mobile-menu-btn {
+      display: block; /* Visible on mobile */
+    }
+    .mobile-menu {
+      display: none; /* Initially hidden */
+      padding: 1rem;
+    }
+    .mobile-menu a:not(.btn) {
+      display: block;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      color: var(--text-medium);
+      transition: color 0.2s, background-color 0.2s;
+    }
+    .mobile-menu a:not(.btn):hover {
+      background-color: #f3f4f6; /* gray-100 */
+      color: var(--text-dark);
+    }
+    .mobile-menu .btn {
+      margin-top: 0.5rem;
+      text-align: center;
+      padding: 0.75rem 1rem;
+    }
+
+    /* --- Components --- */
+    .btn {
+      display: inline-block;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      transition: opacity 0.2s;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+      color: var(--bg-white);
+    }
+    .btn:hover {
+      opacity: 0.9;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* --- Hero Section --- */
+    .hero {
+      text-align: center;
+      padding-top: 6rem; /* Adjusted padding */
+      padding-bottom: 5rem; /* Adjusted padding */
+      background: linear-gradient(135deg, rgba(20,162,171,.15), rgba(11,138,184,.15)); /* Light blue background */
+    }
+    .hero h1 {
+      color: #111827; /* gray-900 */
+    }
+    .hero p {
+      max-width: 56rem; /* max-w-3xl */
+      margin: 1rem auto 0;
+      font-size: 1.125rem; /* text-lg */
+      color: var(--text-medium);
+    }
+    .hero-buttons {
+      margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .hero-buttons .btn-secondary {
+      background-color: var(--bg-white);
+      color: var(--text-dark);
+      border: 2px solid var(--primary-dark);
+    }
+    .hero-buttons .btn-secondary:hover {
+      background-color: var(--primary-dark);
+      color: var(--bg-white);
+    }
+
+    /* --- Stats & Map Section --- */
+    #map-section {
+      padding-top: 0; /* Remove top padding to allow overlap */
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      text-align: center;
+      margin-top: -3rem; /* Overlap effect */
+      position: relative;
+      z-index: 1;
+    }
+    .stat-card {
+      background-color: var(--bg-white);
+      padding: 2rem 1.5rem; /* Increased padding */
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,.04);
+    }
+    .stat-card h3 {
+      font-size: 2rem; /* Increased font size */
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      color: var(--primary-dark); /* Solid color */
+    }
+    .stat-card span {
+      font-size: 0.875rem; /* text-sm */
+      color: #6b7280; /* gray-500 */
+    }
+    #map {
+      width: 100%;
+      height: 500px;
+      border-radius: 0.75rem;
+      z-index: 0;
+      margin-top: 3rem; /* Adjusted margin */
+      background-color: var(--bg-white);
+      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    /* --- About Section --- */
+    .about-section {
+      background-color: var(--bg-white);
+    }
+    .about-grid {
+      display: grid;
+      gap: 3rem;
+      align-items: center;
+    }
+    .about-grid img {
+      border-radius: 0.75rem;
+      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+    .about-grid p {
+      margin-top: 1rem;
+      font-size: 1.125rem;
+      color: var(--text-medium);
+    }
+    .about-grid .btn {
+      margin-top: 1.5rem;
+    }
+
+    /* --- CTA Section --- */
+    .cta-section {
+      text-align: center;
+    }
+    .cta-box {
+      max-width: 64rem;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 2rem;
+      color: var(--text-light);
+      border-radius: 1rem;
+      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+    }
+    .cta-box p {
+      max-width: 42rem;
+      margin: 1rem auto 0;
+      color: #dbeafe; /* blue-100 */
+    }
+    .cta-box .btn {
+      margin-top: 2rem;
+      background-color: var(--bg-white);
+      color: var(--text-dark);
+    }
+    .cta-box .btn:hover {
+      background-color: #e5e7eb; /* gray-200 */
+    }
+
+    /* --- Contact Section --- */
+    .contact-section {
+      background-color: var(--bg-white);
+    }
+    .contact-wrapper {
+      max-width: 42rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .contact-wrapper .header {
+      text-align: center;
+    }
+    .contact-wrapper .header p {
+      margin-top: 0.75rem;
+      font-size: 1.125rem;
+      color: var(--text-medium);
+    }
+    .contact-form {
+      margin-top: 2.5rem;
+      display: grid;
+      gap: 1.5rem;
+    }
+    .contact-form label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #374151; /* gray-700 */
+    }
+    .contact-form input, .contact-form textarea {
+      display: block;
+      width: 100%;
+      margin-top: 0.25rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid #d1d5db; /* gray-300 */
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    }
+    .contact-form input:focus, .contact-form textarea:focus {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+    .contact-form .submit-button {
+      text-align: center;
+    }
+
+    /* --- Footer --- */
+    .footer {
+      background-color: var(--bg-dark);
+      color: #9ca3af; /* gray-400 */
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    /* --- Accessibility --- */
+    .skip-link {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 50;
+      padding: 0.75rem;
+      margin: 0.75rem;
+      background-color: var(--bg-white);
+      color: var(--text-dark);
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      transform: translateY(-120%);
+      transition: transform 0.2s;
+    }
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    /* --- Responsive Design (Media Queries) --- */
+    @media (min-width: 768px) { /* Corresponds to Tailwind's 'md' breakpoint */
+      section {
+        padding-top: 6rem;
+        padding-bottom: 6rem;
+      }
+      h1 {
+        font-size: 3.75rem; /* 60px */
+      }
+      h2 {
+        font-size: 2.25rem; /* 36px */
+      }
+      .nav-desktop {
+        display: flex;
+        align-items: center;
+        gap: 1rem; /* Adjusted gap for button-like links */
+      }
+      .mobile-menu-btn {
+        display: none;
+      }
+      .hero-buttons {
+        flex-direction: row;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+      }
+      #map {
+        margin-top: 3rem;
+      }
+      .about-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .about-grid .content {
+        order: 1;
+      }
+      .about-grid .image {
+        order: 2;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Zum Hauptinhalt springen</a>
+
+  <header class="header">
+    <div class="container nav-container">
+      <a href="#" class="logo">
+        <img src="img/logo.png" alt="NuernbergKlima Logo" />
+      </a>
+      
+      <nav class="nav-desktop">
+        <a href="#map-section">Karte</a>
+        <a href="#about">Über Uns</a>
+        <a href="#mitmachen">Mitmachen</a>
+        <a href="#kontakt" class="btn btn-primary">Kontakt</a>
+      </nav>
+
+      <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Menü öffnen">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+        </svg>
+      </button>
+    </div>
+
+    <div id="mobile-menu" class="mobile-menu">
+      <nav>
+        <a href="#map-section">Karte</a>
+        <a href="#about">Über Uns</a>
+        <a href="#mitmachen">Mitmachen</a>
+        <a href="#kontakt" class="btn btn-primary">Kontakt</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="hero">
+      <div class="container">
+        <h1>Gemeinsam für ein besseres Stadtklima</h1>
+        <p>
+          Das Bürgerportal NuernbergKlima sammelt und visualisiert Echtzeit-Klimadaten aus ganz Nürnberg. Machen Sie mit und gestalten Sie eine grünere, gesündere Zukunft für unsere Stadt.
+        </p>
+        <div class="hero-buttons">
+          <a href="#mitmachen" class="btn btn-primary" style="padding: 0.75rem 2rem; font-size: 1.125rem;">Jetzt Mitmachen</a>
+          <a href="#map-section" class="btn btn-secondary" style="padding: 0.75rem 2rem; font-size: 1.125rem;">Daten entdecken</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="map-section">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-card"><h3>24.1°C</h3><span>Ø Temperatur heute</span></div>
+          <div class="stat-card"><h3>45</h3><span>Sensoren aktiv</span></div>
+          <div class="stat-card"><h3>1.2 t</h3><span>größter Temperaturunterschied heute</span></div>
+          <div class="stat-card"><h3>678</h3><span>Besucher heute</span></div>
+        </div>
+        <div id="map"></div>
+      </div>
+    </section>
+
+    <section id="about" class="about-section">
+      <div class="container about-grid">
+        <div class="content">
+          <h2>Was ist NuernbergKlima?</h2>
+          <p>
+            NuernbergKlima ist eine von Bürgern getragene Initiative, die das Ziel hat, das städtische Mikroklima transparent zu machen. Durch ein Netzwerk von Sensoren, die von Freiwilligen in der ganzen Stadt betrieben werden, erfassen wir live Daten zu Temperatur, Luftfeuchtigkeit und Luftqualität.
+          </p>
+          <p>
+            Unsere offene Plattform bereitet diese Daten auf und stellt sie allen zur Verfügung. So können wir gemeinsam Problemzonen identifizieren, die Auswirkungen von Grünflächen analysieren und fundierte Entscheidungen für eine klimaresiliente Stadtentwicklung treffen.
+          </p>
+          <a href="#" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">Mehr über unsere Mission</a>
+        </div>
+      </div>
+    </section>
+    
+    <section id="mitmachen" class="cta-section">
+        <div class="container">
+            <div class="cta-box">
+                <h2>Werden Sie Teil der Klimabewegung</h2>
+                <p>
+                    Setzen Sie ein Zeichen und helfen Sie uns, Nürnberg lebenswerter zu machen. Ob Sie einen Sensor aufstellen, Daten analysieren oder die Idee verbreiten – jeder Beitrag zählt.
+                </p>
+                <a href="#kontakt" class="btn" style="padding: 0.75rem 2rem;">Jetzt anmelden & mitmachen</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="kontakt" class="contact-section">
+      <div class="container contact-wrapper">
+        <div class="header">
+            <h2>Kontakt aufnehmen</h2>
+            <p>Haben Sie Fragen, Feedback oder möchten Sie mitarbeiten? Schreiben Sie uns!</p>
+        </div>
+        <form action="#" class="contact-form">
+          <div>
+            <label for="name">Ihr Name</label>
+            <input id="name" type="text" placeholder="Max Mustermann" required />
+          </div>
+          <div>
+            <label for="email">Ihre E-Mail</label>
+            <input id="email" type="email" placeholder="max.mustermann@email.de" required />
+          </div>
+          <div>
+            <label for="message">Ihre Nachricht</label>
+            <textarea id="message" rows="4" placeholder="Ihre Nachricht..."></textarea>
+          </div>
+          <div class="submit-button">
+            <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2.5rem;">Absenden</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© <span id="year"></span> NuernbergKlima | Ein Projekt von engagierten Bürgern.</p>
+    </div>
+  </footer>
+
+  <!-- Leaflet & Map Scripts (Local) -->
+  <script src="/leaflet/leaflet.js" defer></script>
+  <script src="/scripts/map.js" defer></script>
+
+  <script>
+    // --- Mobile Menu Toggle ---
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuBtn.addEventListener('click', () => {
+      // Toggle the 'display' property
+      if (mobileMenu.style.display === 'block') {
+        mobileMenu.style.display = 'none';
+      } else {
+        mobileMenu.style.display = 'block';
+      }
+    });
+
+    // --- Footer Year ---
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // The map initialization is now expected to be in /scripts/map.js
+  </script>
+</body>
+</html>

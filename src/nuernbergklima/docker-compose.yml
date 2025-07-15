@@ -3,8 +3,8 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    container_name: the_floor_is_lava
+    container_name: nuernbergklima
     restart: always
     ports:
-      - "8080:80"
+      - "8060:80"
       - "8443:443"
