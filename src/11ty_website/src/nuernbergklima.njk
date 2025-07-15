@@ -1,0 +1,144 @@
+---
+title: NuernbergKlima
+layout: includes/layout.njk
+---
+<a href="#main-content" class="skip-link">Zum Hauptinhalt springen</a>
+
+<header class="header">
+  <div class="container nav-container">
+    <a href="#" class="logo">
+      <img src="/img/logo.png" alt="NuernbergKlima Logo" />
+    </a>
+    <nav class="nav-desktop">
+      <a href="#map-section">Karte</a>
+      <a href="#about">Über Uns</a>
+      <a href="#mitmachen">Mitmachen</a>
+      <a href="#kontakt" class="btn btn-primary">Kontakt</a>
+    </nav>
+    <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Menü öffnen">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+      </svg>
+    </button>
+  </div>
+  <div id="mobile-menu" class="mobile-menu">
+    <nav>
+      <a href="#map-section">Karte</a>
+      <a href="#about">Über Uns</a>
+      <a href="#mitmachen">Mitmachen</a>
+      <a href="#kontakt" class="btn btn-primary">Kontakt</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main-content">
+  <section class="hero">
+    <div class="container">
+      <h1>Gemeinsam für ein besseres Stadtklima</h1>
+      <p>
+        Das Bürgerportal NuernbergKlima sammelt und visualisiert Echtzeit-Klimadaten aus ganz Nürnberg. Machen Sie mit und gestalten Sie eine grünere, gesündere Zukunft für unsere Stadt.
+      </p>
+      <div class="hero-buttons">
+        <a href="#mitmachen" class="btn btn-primary" style="padding: 0.75rem 2rem; font-size: 1.125rem;">Jetzt Mitmachen</a>
+        <a href="#map-section" class="btn btn-secondary" style="padding: 0.75rem 2rem; font-size: 1.125rem;">Daten entdecken</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="map-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-card"><h3>24.1°C</h3><span>Ø Temperatur heute</span></div>
+        <div class="stat-card"><h3>45</h3><span>Sensoren aktiv</span></div>
+        <div class="stat-card"><h3>1.2 t</h3><span>größter Temperaturunterschied heute</span></div>
+        <div class="stat-card"><h3>678</h3><span>Besucher heute</span></div>
+      </div>
+      <div id="map"></div>
+    </div>
+  </section>
+
+  <section id="about" class="about-section">
+    <div class="container about-grid">
+      <div class="content">
+        <h2>Was ist NuernbergKlima?</h2>
+        <p>
+          NuernbergKlima ist eine von Bürgern getragene Initiative, die das Ziel hat, das städtische Mikroklima transparent zu machen. Durch ein Netzwerk von Sensoren, die von Freiwilligen in der ganzen Stadt betrieben werden, erfassen wir live Daten zu Temperatur, Luftfeuchtigkeit und Luftqualität.
+        </p>
+        <p>
+          Unsere offene Plattform bereitet diese Daten auf und stellt sie allen zur Verfügung. So können wir gemeinsam Problemzonen identifizieren, die Auswirkungen von Grünflächen analysieren und fundierte Entscheidungen für eine klimaresiliente Stadtentwicklung treffen.
+        </p>
+        <a href="#" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">Mehr über unsere Mission</a>
+      </div>
+      <div class="image">
+        <img src="https://images.unsplash.com/photo-1563223992-ebb141743602?q=80&w=1974&auto=format&fit=crop" alt="Ansicht der Nürnberger Burg" />
+      </div>
+    </div>
+  </section>
+  
+  <section id="mitmachen" class="cta-section">
+      <div class="container">
+          <div class="cta-box">
+              <h2>Werden Sie Teil der Klimabewegung</h2>
+              <p>
+                  Setzen Sie ein Zeichen und helfen Sie uns, Nürnberg lebenswerter zu machen. Ob Sie einen Sensor aufstellen, Daten analysieren oder die Idee verbreiten – jeder Beitrag zählt.
+              </p>
+              <a href="#kontakt" class="btn" style="padding: 0.75rem 2rem;">Jetzt anmelden & mitmachen</a>
+          </div>
+      </div>
+  </section>
+
+  <section id="kontakt" class="contact-section">
+    <div class="container contact-wrapper">
+      <div class="header">
+          <h2>Kontakt aufnehmen</h2>
+          <p>Haben Sie Fragen, Feedback oder möchten Sie mitarbeiten? Schreiben Sie uns!</p>
+      </div>
+      <form action="#" class="contact-form">
+        <div>
+          <label for="name">Ihr Name</label>
+          <input id="name" type="text" placeholder="Max Mustermann" required />
+        </div>
+        <div>
+          <label for="email">Ihre E-Mail</label>
+          <input id="email" type="email" placeholder="max.mustermann@email.de" required />
+        </div>
+        <div>
+          <label for="message">Ihre Nachricht</label>
+          <textarea id="message" rows="4" placeholder="Ihre Nachricht..."></textarea>
+        </div>
+        <div class="submit-button">
+          <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2.5rem;">Absenden</button>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <p>© <span id="year"></span> NuernbergKlima | Ein Projekt von engagierten Bürgern.</p>
+  </div>
+</footer>
+
+<!-- Leaflet & Map Scripts (Local) -->
+<script src="/leaflet/leaflet.js" defer></script>
+<script src="/scripts/map.js" defer></script>
+
+<script>
+  // --- Mobile Menu Toggle ---
+  const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  mobileMenuBtn.addEventListener('click', () => {
+    // Toggle the 'display' property
+    if (mobileMenu.style.display === 'block') {
+      mobileMenu.style.display = 'none';
+    } else {
+      mobileMenu.style.display = 'block';
+    }
+  });
+
+  // --- Footer Year ---
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // The map initialization is now expected to be in /scripts/map.js
+</script> 
