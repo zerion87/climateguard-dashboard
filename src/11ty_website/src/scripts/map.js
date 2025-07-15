@@ -76,13 +76,13 @@ document.addEventListener("DOMContentLoaded", function () {
             sensors = {};
             result.data.forEach(dev => {
                 // Nur Geräte mit Koordinaten
-                if (dev.latitude !== null && dev.longitude !== null) {
+                
                     sensors[dev.device_id] = {
                         lat: dev.latitude,
                         lon: dev.longitude,
                         name: dev.name
                     };
-                }
+                
             });
         } catch (err) {
             console.error("Fetch-Error (Metadata):", err);
@@ -148,7 +148,9 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!sel) return;
 
             const i    = readings.indexOf(sel);
-            const prev = i >= 1 ? readings[i - 1] : null;
+            const prev = (i !== -1 && i + 1 < readings.length)
+           ? readings[i + 1]
+           : null;
             const trend = prev ? getTrendArrow(prev.temperature, sel.temperature) : "➖";
 
             const meta = sensors[sensorId];
@@ -175,6 +177,6 @@ document.addEventListener("DOMContentLoaded", function () {
     (async function init() {
         await loadSensorMetadata();      // 1x Metadata holen
         await loadTemperatureData();     // erste Meterik-Daten und Karte zeichnen
-        setInterval(loadTemperatureData, 30000);  // dann alle 30 s nur die Metriken nachladen
+        setInterval(loadTemperatureData, 600000);  // dann alle 30 s nur die Metriken nachladen
     })();
 });
