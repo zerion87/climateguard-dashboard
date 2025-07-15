@@ -19,4 +19,4 @@ jobs:
         
       - name: Build and Run Docker image
         run: |
-          docker compose -f nuernbergklima/docker-compose.yml up -d --build
+          docker compose -f src/nuernbergklima/docker-compose.yml up -d --build
