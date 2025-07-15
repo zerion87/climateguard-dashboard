@@ -2,7 +2,7 @@ services:
   the_floor_is_lava:
     build:
       context: ..
-      dockerfile: docker/Dockerfile
+      dockerfile: src/nuernbergklima/Dockerfile
     container_name: nuernbergklima
     restart: always
     ports:
