@@ -6,8 +6,18 @@
   <meta name="description" content="NuernbergKlima – Bürgerportal zur Verbesserung des Stadtklimas in Nürnberg mit Echtzeitdaten, interaktiven Karten und Bürgerbeteiligung.">
   <title>NuernbergKlima – Bürgerportal</title>
 
-  <!-- Leaflet CSS (Local) -->
-  <link rel="stylesheet" href="/leaflet/leaflet.css" />
+<!-- Leaflet-Styles -->
+<link rel="stylesheet" href="/leaflet/leaflet.css" />
+<link rel="stylesheet" href="/leaflet/MarkerCluster.css" />
+<link rel="stylesheet" href="/leaflet/MarkerCluster.Default.css" />
+
+<!-- Leaflet-Scripts -->
+<script src="/leaflet/leaflet.js"></script>
+<script src="/leaflet/leaflet.markercluster.js"></script>
+<script src="/leaflet/leaflet-heat.js"></script>
+
+<!-- Karte-Script -->
+<script src="/scripts/map.js" defer></script>
 
   <style>
     /* --- Base & Variables --- */
@@ -530,9 +540,7 @@
     </div>
   </footer>
 
-  <!-- Leaflet & Map Scripts (Local) -->
-  <script src="/leaflet/leaflet.js" defer></script>
-  <script src="/scripts/map.js" defer></script>
+
 
   <script>
     // --- Mobile Menu Toggle ---
