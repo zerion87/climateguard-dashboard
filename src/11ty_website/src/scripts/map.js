@@ -27,6 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Datenstrukturen
     let sensorData = {};   // { sensorId: [ { timestamp, temperature }, … ] }
     let timeStamps = [];   // alle einzigartigen Zeitstempel
+    let sensors   = {};    // wird per API befüllt: { device_id: { lat, lon, name } }
     let firstLoad = true;
 
     // Slider-Elemente
@@ -34,17 +35,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const timeDisplay = document.getElementById("selected-time");
     timeSlider.min = 0;
 
-    // Mapping device_id → Position & Name
-    const sensors = {
-        1: { lat: 49.440754, lon: 10.942086, name: "Lora3 Sensor" },
-        2: { lat: 49.448719, lon: 11.08766,  name: "Andis Sensor" }
-    };
-
-    // Hilfsfunktionen
+    // Hilfsfunktionen (unverändert)
     function normalizeTemperature(temp, minTemp = -10, maxTemp = 40) {
         return Math.max(0, Math.min(1, (temp - minTemp) / (maxTemp - minTemp)));
     }
-
     function getTrendArrow(previous, current) {
         const p = Math.round(previous);
         const c = Math.round(current);
@@ -52,7 +46,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (c < p) return "🔽";
         return "➖";
     }
-
     function addClusteredMarker(lat, lon, temp, name, trend, timestamp) {
         const rounded = Math.round(temp);
         const icon = L.divIcon({
@@ -70,13 +63,39 @@ document.addEventListener("DOMContentLoaded", function () {
         markers.addLayer(marker);
     }
 
-    // Daten von API laden
-    async function loadTemperatureData() {
-        const apiUrl = "https://api.quantum.hackerban.de/v2/metrics";
+    // 1) Sensor-Metadaten laden
+    async function loadSensorMetadata() {
+        const devicesUrl = "https://api.quantum.hackerban.de/v2/devices";
         try {
-            const resp = await fetch(apiUrl);
+            const resp = await fetch(devicesUrl);
             if (!resp.ok) {
-                console.error("Fehler beim Abruf:", await resp.text());
+                console.error("Fehler beim Abruf der Sensor-Metadaten:", await resp.text());
+                return;
+            }
+            const result = await resp.json();
+            sensors = {};
+            result.data.forEach(dev => {
+                // Nur Geräte mit Koordinaten
+                if (dev.latitude !== null && dev.longitude !== null) {
+                    sensors[dev.device_id] = {
+                        lat: dev.latitude,
+                        lon: dev.longitude,
+                        name: dev.name
+                    };
+                }
+            });
+        } catch (err) {
+            console.error("Fetch-Error (Metadata):", err);
+        }
+    }
+
+    // 2) Temperatur-Daten laden und Karte updaten
+    async function loadTemperatureData() {
+        const metricsUrl = "https://api.quantum.hackerban.de/v2/metrics";
+        try {
+            const resp = await fetch(metricsUrl);
+            if (!resp.ok) {
+                console.error("Fehler beim Abruf der Metriken:", await resp.text());
                 return;
             }
             const result  = await resp.json();
@@ -88,22 +107,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Einträge gruppieren
             entries.forEach(({ device_id, temperature, timestamp_server }) => {
-                const id = device_id;
-                const ts = timestamp_server;
+                const id   = device_id;
+                const ts   = timestamp_server;
                 const temp = parseFloat(temperature);
-
                 if (!sensorData[id]) sensorData[id] = [];
                 sensorData[id].push({ timestamp: ts, temperature: temp });
-
                 if (!timeStamps.includes(ts)) timeStamps.push(ts);
             });
 
-            // Zeitstempel sortieren
+            // Zeitstempel sortieren und Slider-Range setzen
             timeStamps.sort((a, b) => a - b);
             timeSlider.max   = timeStamps.length - 1;
             timeSlider.value = timeSlider.max;
 
-            // pro Sensor: readings absteigend sortieren (neuester zuerst)
+            // pro Sensor: readings sortieren (neuester zuerst)
             Object.keys(sensorData).forEach(id => {
                 sensorData[id].sort((a, b) => b.timestamp - a.timestamp);
             });
@@ -112,13 +129,13 @@ document.addEventListener("DOMContentLoaded", function () {
             updateMap(Number(timeSlider.value));
         }
         catch (err) {
-            console.error("Fetch-Error:", err);
+            console.error("Fetch-Error (Metrics):", err);
         }
     }
 
-    // Karte updaten auf Basis des Sliders
+    // 3) Karte updaten auf Basis des Sliders
     function updateMap(timeIndex) {
-        const idx = Number(timeIndex);
+        const idx   = Number(timeIndex);
         const selTs = timeStamps[idx];
         timeDisplay.innerText = new Date(selTs * 1000).toLocaleString();
 
@@ -127,36 +144,37 @@ document.addEventListener("DOMContentLoaded", function () {
 
         Object.keys(sensorData).forEach(sensorId => {
             const readings = sensorData[sensorId];
-            // erstes Reading (absteigend sortiert), das <= selektiertem Timestamp ist
-            const sel = readings.find(r => r.timestamp <= selTs);
+            const sel      = readings.find(r => r.timestamp <= selTs);
             if (!sel) return;
 
-            // Trend berechnen: nächster (älterer) Eintrag in der absteigend sortierten Liste
-            const i = readings.indexOf(sel);
+            const i    = readings.indexOf(sel);
             const prev = i >= 1 ? readings[i - 1] : null;
             const trend = prev ? getTrendArrow(prev.temperature, sel.temperature) : "➖";
 
-            const { lat, lon, name } = sensors[sensorId] || {};
-            if (!lat) return;  // kein Mapping vorhanden
+            const meta = sensors[sensorId];
+            if (!meta) return;  // kein Mapping vorhanden => überspringen
 
-            addClusteredMarker(lat, lon, sel.temperature, name, trend, sel.timestamp);
-            heatmapLayer.addLatLng([lat, lon, normalizeTemperature(sel.temperature)]);
+            addClusteredMarker(meta.lat, meta.lon, sel.temperature, meta.name, trend, sel.timestamp);
+            heatmapLayer.addLatLng([meta.lat, meta.lon, normalizeTemperature(sel.temperature)]);
         });
 
-        // Beim ersten Mal an alle Sensor-Positionen anpassen
         if (firstLoad) {
-            const bounds = new L.LatLngBounds(
-                Object.values(sensors).map(s => [s.lat, s.lon])
-            );
-            map.fitBounds(bounds, { padding: [50, 50] });
+            // Fit Bounds nur über tatsächlich vorhandene Sensor-Positionen
+            const coords = Object.values(sensors).map(s => [s.lat, s.lon]);
+            if (coords.length) {
+                const bounds = new L.LatLngBounds(coords);
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
             firstLoad = false;
         }
     }
 
-    // Event-Listener
+    // Event-Listener & Initialisierung
     timeSlider.addEventListener("input", () => updateMap(timeSlider.value));
 
-    // Initial laden & Intervall-Refresh
-    loadTemperatureData();
-    setInterval(loadTemperatureData, 30000);
+    (async function init() {
+        await loadSensorMetadata();      // 1x Metadata holen
+        await loadTemperatureData();     // erste Meterik-Daten und Karte zeichnen
+        setInterval(loadTemperatureData, 30000);  // dann alle 30 s nur die Metriken nachladen
+    })();
 });
