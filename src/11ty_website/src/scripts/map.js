@@ -75,14 +75,13 @@ document.addEventListener("DOMContentLoaded", function () {
             const result = await resp.json();
             sensors = {};
             result.data.forEach(dev => {
-                // Nur Geräte mit Koordinaten
-                
+                if (dev.latitude !== null && dev.longitude !== null) {
                     sensors[dev.device_id] = {
                         lat: dev.latitude,
                         lon: dev.longitude,
                         name: dev.name
                     };
-                
+                }
             });
         } catch (err) {
             console.error("Fetch-Error (Metadata):", err);
@@ -147,10 +146,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const sel      = readings.find(r => r.timestamp <= selTs);
             if (!sel) return;
 
-            const i    = readings.indexOf(sel);
-            const prev = (i !== -1 && i + 1 < readings.length)
-           ? readings[i + 1]
-           : null;
+            // hier nur die tatsächlich ältere Messung nehmen:
+            const prev = readings.find(r => r.timestamp < sel.timestamp) || null;
             const trend = prev ? getTrendArrow(prev.temperature, sel.temperature) : "➖";
 
             const meta = sensors[sensorId];
@@ -161,7 +158,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         if (firstLoad) {
-            // Fit Bounds nur über tatsächlich vorhandene Sensor-Positionen
             const coords = Object.values(sensors).map(s => [s.lat, s.lon]);
             if (coords.length) {
                 const bounds = new L.LatLngBounds(coords);
