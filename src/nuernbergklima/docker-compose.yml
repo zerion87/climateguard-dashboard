@@ -1,7 +1,7 @@
 services:
-  the_floor_is_lava:
+  nurnbergklima:
     build:
-      context: ..
+      context: .
       dockerfile: Dockerfile
     container_name: nuernbergklima
     restart: always
