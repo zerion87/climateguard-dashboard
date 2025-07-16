@@ -117,6 +117,47 @@ document.addEventListener("DOMContentLoaded", function () {
         return maxTemp;
     }
 
+    // Funktion zum Finden des größten Temperaturunterschieds in 10-Minuten-Intervallen und Update der Stat-Card
+    function updateMaxTemperatureDifference() {
+        // 1. Alle Messwerte in 10-Minuten-Buckets gruppieren
+        const bucketTemps = {};
+        Object.values(sensorData).forEach(readings => {
+            readings.forEach(r => {
+                if (typeof r.temperature === 'number' && !isNaN(r.temperature)) {
+                    // 10-Minuten-Bucket berechnen (timestamp in Sekunden)
+                    const bucket = Math.floor(r.timestamp / 600); // 600 Sekunden = 10 Minuten
+                    if (!bucketTemps[bucket]) bucketTemps[bucket] = [];
+                    bucketTemps[bucket].push(r.temperature);
+                }
+            });
+        });
+        // 2. Für jeden Bucket Differenz berechnen
+        let maxDiff = null;
+        Object.values(bucketTemps).forEach(temps => {
+            if (temps.length > 1) {
+                const min = Math.min(...temps);
+                const max = Math.max(...temps);
+                const diff = max - min;
+                if (maxDiff === null || diff > maxDiff) {
+                    maxDiff = diff;
+                }
+            }
+        });
+        // 3. Stat-Card aktualisieren
+        const statsGrid = document.querySelector('.stats-grid');
+        if (statsGrid) {
+            const diffStatCard = statsGrid.querySelector('.stat-card:nth-child(3)');
+            if (diffStatCard) {
+                const h3Element = diffStatCard.querySelector('h3');
+                if (h3Element) {
+                    h3Element.textContent = maxDiff !== null ? `${maxDiff.toFixed(1)}°C` : '--';
+                }
+            }
+        }
+        console.log(`Größter Temperaturunterschied in 10-Minuten-Intervallen: ${maxDiff}`);
+        return maxDiff;
+    }
+
     // 1) Sensor-Metadaten laden
     async function loadSensorMetadata() {
         const devicesUrl = "https://api.quantum.hackerban.de/v2/devices";
@@ -224,6 +265,8 @@ document.addEventListener("DOMContentLoaded", function () {
         updateActiveSensorsCount();
         // Update der höchsten Temperatur
         updateHighestTemperature();
+        // Update des größten Temperaturunterschieds
+        updateMaxTemperatureDifference();
     }
 
     // Event-Listener & Initialisierung
