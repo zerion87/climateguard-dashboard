@@ -88,6 +88,35 @@ document.addEventListener("DOMContentLoaded", function () {
         return activeCount;
     }
 
+    // Funktion zum Finden der höchsten gemessenen Temperatur und Update der Stat-Card
+    function updateHighestTemperature() {
+        let maxTemp = null;
+        Object.values(sensorData).forEach(readings => {
+            readings.forEach(r => {
+                if (typeof r.temperature === 'number' && !isNaN(r.temperature)) {
+                    if (maxTemp === null || r.temperature > maxTemp) {
+                        maxTemp = r.temperature;
+                    }
+                }
+            });
+        });
+        
+        // Update der Stat-Card "Ø Temperatur heute"
+        const statsGrid = document.querySelector('.stats-grid');
+        if (statsGrid) {
+            const tempStatCard = statsGrid.querySelector('.stat-card:nth-child(1)');
+            if (tempStatCard) {
+                const h3Element = tempStatCard.querySelector('h3');
+                if (h3Element) {
+                    h3Element.textContent = maxTemp !== null ? `${maxTemp.toFixed(1)}°C` : '--';
+                }
+            }
+        }
+        
+        console.log(`Höchste gemessene Temperatur: ${maxTemp}`);
+        return maxTemp;
+    }
+
     // 1) Sensor-Metadaten laden
     async function loadSensorMetadata() {
         const devicesUrl = "https://api.quantum.hackerban.de/v2/devices";
@@ -193,6 +222,8 @@ document.addEventListener("DOMContentLoaded", function () {
         
         // Update der aktiven Sensoren-Anzahl
         updateActiveSensorsCount();
+        // Update der höchsten Temperatur
+        updateHighestTemperature();
     }
 
     // Event-Listener & Initialisierung
