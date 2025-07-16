@@ -63,6 +63,31 @@ document.addEventListener("DOMContentLoaded", function () {
         markers.addLayer(marker);
     }
 
+    // Funktion zum Zählen aktiver Sensoren und Update der Stat-Card
+    function updateActiveSensorsCount() {
+        // Zähle Sensoren, die sowohl Metadaten als auch aktuelle Daten haben
+        const activeSensors = Object.keys(sensorData).filter(sensorId => {
+            return sensors[sensorId] && sensorData[sensorId].length > 0;
+        });
+        
+        const activeCount = activeSensors.length;
+        
+        // Update der Stat-Card "Sensoren aktiv"
+        const statsGrid = document.querySelector('.stats-grid');
+        if (statsGrid) {
+            const sensorStatCard = statsGrid.querySelector('.stat-card:nth-child(2)');
+            if (sensorStatCard) {
+                const h3Element = sensorStatCard.querySelector('h3');
+                if (h3Element) {
+                    h3Element.textContent = activeCount.toString();
+                }
+            }
+        }
+        
+        console.log(`Aktive Sensoren: ${activeCount}`);
+        return activeCount;
+    }
+
     // 1) Sensor-Metadaten laden
     async function loadSensorMetadata() {
         const devicesUrl = "https://api.quantum.hackerban.de/v2/devices";
@@ -165,6 +190,9 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             firstLoad = false;
         }
+        
+        // Update der aktiven Sensoren-Anzahl
+        updateActiveSensorsCount();
     }
 
     // Event-Listener & Initialisierung
