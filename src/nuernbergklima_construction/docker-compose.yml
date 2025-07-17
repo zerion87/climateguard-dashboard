@@ -3,8 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: nuernbergklima
+    container_name: nuernbergklima_construction
     restart: always
     ports:
-      - "8060:80"
-      - "9443:443"
+      - "9180:80"
+      - "9143:443"
