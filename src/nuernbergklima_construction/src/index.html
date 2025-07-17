@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="de" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Hier entsteht die Website für das Sensornetzwerk im Klimaquartier Annapark in Nürnberg.">
+  <title>Sensornetzwerk Annapark – Im Aufbau</title>
+
+  <style>
+    /* --- Base & Variables --- */
+    :root {
+      --primary-light: #14A2AB;
+      --primary-dark:  #0B8AB8;
+      --text-dark: #1f2937; /* gray-800 */
+      --text-medium: #4b5563; /* gray-600 */
+      --text-light: #f9fafb; /* gray-50 */
+      --bg-light: #f9fafb; /* gray-50 */
+      --bg-white: #ffffff;
+      --bg-dark: #1f2937; /* gray-800 */
+    }
+
+    /* Local Poppins Fonts (Annahme: Pfade sind korrekt) */
+    @font-face {
+      font-family: 'Poppins';
+      font-style: normal;
+      font-weight: 300;
+      src: url('/fonts/Poppins-Light.ttf') format('truetype');
+    }
+    @font-face {
+      font-family: 'Poppins';
+      font-style: normal;
+      font-weight: 400;
+      src: url('/fonts/Poppins-Regular.ttf') format('truetype');
+    }
+    @font-face {
+      font-family: 'Poppins';
+      font-style: normal;
+      font-weight: 600;
+      src: url('/fonts/Poppins-SemiBold.ttf') format('truetype');
+    }
+
+    /* --- General Styling --- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: var(--text-dark);
+      background-color: var(--bg-light);
+    }
+    .container {
+      max-width: 1280px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    section {
+      padding-top: 3rem;
+      padding-bottom: 3rem;
+    }
+    h1 {
+      font-size: 2.25rem; /* 36px */
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: #111827; /* gray-900 */
+    }
+    h2 {
+      font-size: 1.875rem; /* 30px */
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      margin-bottom: 1rem;
+    }
+    p {
+      line-height: 1.6;
+      max-width: 56rem; /* max-w-3xl */
+      margin-left: auto;
+      margin-right: auto;
+    }
+    ul {
+        list-style-position: inside;
+        text-align: left;
+        max-width: 48rem; /* max-w-2xl */
+        margin: 1rem auto 0;
+        padding-left: 1rem;
+    }
+    li {
+        margin-bottom: 0.75rem;
+        color: var(--text-medium);
+        line-height: 1.6;
+    }
+    
+    /* --- Header & Logo --- */
+    .site-header {
+        background-color: var(--bg-white);
+        padding: 1rem 0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .logo-container {
+        display: flex;
+        justify-content: center;
+    }
+    .logo-container img {
+        max-width: 250px;
+        height: auto;
+    }
+
+    /* --- Content Section --- */
+    .content-section {
+      text-align: center;
+      min-height: 85vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(20,162,171,.1), rgba(11,138,184,.1));
+      padding-top: 2rem;
+      padding-bottom: 4rem;
+    }
+    .content-section .subtitle {
+      margin-top: 1rem;
+      font-size: 1.125rem;
+      color: var(--text-medium);
+    }
+    .content-section .outro {
+      margin-top: 3rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* --- Info & Sponsors Section --- */
+    .info-section, .sponsors-section {
+        text-align: center;
+    }
+    .sponsors-section {
+        background-color: var(--bg-white);
+    }
+    .sponsors-section h2, .info-section h2 {
+        margin-top: 0;
+        color: var(--text-medium);
+        font-size: 1.25rem;
+        font-weight: 400;
+    }
+    .logo-grid {
+        margin-top: 2.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 4rem;
+    }
+    .logo-grid img {
+        max-height: 55px; /* Höhe der Sponsoren-Logos anpassen */
+        max-width: 200px;
+        filter: grayscale(100%);
+        opacity: 0.7;
+        transition: all 0.2s ease-in-out;
+    }
+    .logo-grid img:hover {
+        filter: grayscale(0%);
+        opacity: 1;
+    }
+
+    /* --- Impressum Section --- */
+    .impressum-section {
+        background-color: var(--bg-white);
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+    .impressum-section .container {
+        max-width: 48rem;
+    }
+    .impressum-section p {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: var(--text-medium);
+        text-align: left;
+    }
+    
+    /* --- Footer --- */
+    .footer {
+      background-color: var(--bg-dark);
+      color: #9ca3af; /* gray-400 */
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    /* --- Responsive Design --- */
+    @media (min-width: 768px) {
+      h1 {
+        font-size: 3.75rem;
+      }
+      h2 {
+        font-size: 2.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+        <div class="logo-container">
+            <img src="logo_final1.png" alt="Sensornetzwerk Annapark Logo">
+        </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="content-section">
+      <div class="container">
+        <h1><span class="gradient-text">Sensornetzwerk Annapark</span></h1>
+        <p class="subtitle">Website im Aufbau</p>
+        <h2 style="margin-top: 2.5rem;">Worum geht es?</h2>
+        <ul>
+            <li>Im Viertel Annapark werden kleine, autarke Sensormodule zur Temperaturmessung verteilt.</li>
+            <li>Die Sensoren liefern aktuelle Klimadaten aus dem Quartier und visualisieren diese auf einer interaktiven Karte.</li>
+            <li>Ziel ist es, das Bewusstsein für Mikroklimata zu schärfen, insbesondere für bewohnende und vulnerable Gruppen wie ältere oder hitzeempfindliche Menschen.</li>
+            <li>Die erhobenen Daten machen Veränderungen durch Stadtumbau und Begrünung unmittelbar messbar.</li>
+            <li>Die vollständige Plattform mit Live-Daten und interaktiver Darstellung ist momentan in Vorbereitung und wird hier demnächst verfügbar sein.</li>
+        </ul>
+        <p class="outro">Bleib gespannt!</p>
+      </div>
+    </section>
+
+    <section class="info-section">
+        <div class="container">
+            <p>
+                Hierbei handelt es sich um ein Pilotprojekt im Rahmen der Nationalen Stadtentwicklung des Bundesministerium für Wohnen, Stadtentwicklung und Bauwesen
+            </p>
+        </div>
+    </section>
+
+<section class="sponsors-section">
+    <div class="container">
+        <h2>Gefördert durch</h2>
+        <div class="logo-grid">
+            <a href="https://www.waswaerewenn2035.de/" target="_blank" rel="noopener noreferrer">
+                <img src="UL_WWW_Wortmarke_Schwarz+Slogan.png" alt="Sponsor 1 Logo">
+            </a>
+            <a href="https://www.urbanlab-nuernberg.de/" target="_blank" rel="noopener noreferrer">
+                <img src="UL-Logo.png" alt="Sponsor 2 Logo">
+            </a>
+
+        </div>
+    </div>
+</section>
+
+    <section class="impressum-section">
+        <div class="container">
+            <h2>Impressum</h2>
+            
+            <p>
+                Koitka, Mirring, Schädlich GbR<br>
+                Flaschenhofstraße 4<br>
+                90402 Nürnberg<br>
+            </p>
+            <p>
+                <strong>Vertreten durch:</strong><br>
+                Daniel Schädlich
+            </p>
+            <p>
+                <strong>Kontakt:</strong><br>                
+                E-Mail: climateguard@hackerban.de
+            </p>
+            <p>
+                <strong>Verantwortlich für den Inhalt:</strong><br>
+                Daniel Schädlich
+                Thomas-Mann-Str. 37
+                90513 Zirndorf
+            </p>
+        </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© <span id="year"></span> Nuernbergklima.de</p>
+    </div>
+  </footer>
+
+  <script>
+    // --- Footer Year ---
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+
+</body>
+</html>
