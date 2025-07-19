@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 1) Sensor-Metadaten laden
     async function loadSensorMetadata() {
-        const devicesUrl = "https://api.quantum.hackerban.de/v2/devices";
+        const devicesUrl = "https://api.quantum.hackerban.de/v2/devices?tag=Annapark";
         try {
             const resp = await fetch(devicesUrl);
             if (!resp.ok) {
@@ -183,49 +183,72 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // 2) Temperatur-Daten laden und Karte updaten
-    async function loadTemperatureData() {
-        const metricsUrl = "https://api.quantum.hackerban.de/v2/metrics";
-        try {
-            const resp = await fetch(metricsUrl);
-            if (!resp.ok) {
-                console.error("Fehler beim Abruf der Metriken:", await resp.text());
-                return;
-            }
-            const result  = await resp.json();
-            const entries = result.data;
-
-            // Reset
-            sensorData = {};
-            timeStamps = [];
-
-            // Einträge gruppieren
-            entries.forEach(({ device_id, temperature, timestamp_server }) => {
-                const id   = device_id;
-                const ts   = timestamp_server;
-                const temp = parseFloat(temperature);
-                if (!sensorData[id]) sensorData[id] = [];
-                sensorData[id].push({ timestamp: ts, temperature: temp });
-                if (!timeStamps.includes(ts)) timeStamps.push(ts);
-            });
-
-            // Zeitstempel sortieren und Slider-Range setzen
-            timeStamps.sort((a, b) => a - b);
-            timeSlider.max   = timeStamps.length - 1;
-            timeSlider.value = timeSlider.max;
-
-            // pro Sensor: readings sortieren (neuester zuerst)
-            Object.keys(sensorData).forEach(id => {
-                sensorData[id].sort((a, b) => b.timestamp - a.timestamp);
-            });
-
-            // Karte initial updaten
-            updateMap(Number(timeSlider.value));
-        }
-        catch (err) {
-            console.error("Fetch-Error (Metrics):", err);
-        }
+// 2) Temperatur-Daten laden und Karte updaten (nur heute, nur vorher geladene Sensors)
+async function loadTemperatureData() {
+    // Sensoren sicherstellen
+    const deviceIds = Object.keys(sensors);
+    if (deviceIds.length === 0) {
+        console.warn("Keine Sensoren vorhanden. Bitte erst loadSensorMetadata() aufrufen.");
+        return;
     }
+
+    // Zeitraum: Anfang und Ende des aktuellen Tages
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfDay   = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
+    const startIso   = startOfDay.toISOString();
+    const endIso     = endOfDay.toISOString();
+
+    // Metrics-Request mit device_ids + Zeitfilter
+    const metricsUrl = `https://api.quantum.hackerban.de/v2/metrics`
+        + `?device_ids=${deviceIds.join(",")}`
+        + `&start=${encodeURIComponent(startIso)}`
+        + `&end=${encodeURIComponent(endIso)}`;
+
+    try {
+        const resp = await fetch(metricsUrl);
+        if (!resp.ok) {
+            console.error("Fehler beim Abruf der Metriken:", await resp.text());
+            return;
+        }
+        const result  = await resp.json();
+        const entries = result.data;
+
+        // Reset
+        sensorData = {};
+        timeStamps = [];
+
+        // Einträge gruppieren (nur für IDs, die in sensors existieren)
+        entries.forEach(({ device_id, temperature, timestamp_server }) => {
+            if (!(device_id in sensors)) return;
+
+            const ts   = timestamp_server;
+            const temp = parseFloat(temperature);
+            if (!sensorData[device_id]) sensorData[device_id] = [];
+            sensorData[device_id].push({ timestamp: ts, temperature: temp });
+
+            if (!timeStamps.includes(ts)) {
+                timeStamps.push(ts);
+            }
+        });
+
+        // Zeitstempel sortieren und Slider-Range setzen
+        timeStamps.sort((a, b) => a - b);
+        timeSlider.max   = timeStamps.length - 1;
+        timeSlider.value = timeSlider.max;
+
+        // pro Sensor: readings sortieren (neuester zuerst)
+        Object.keys(sensorData).forEach(id => {
+            sensorData[id].sort((a, b) => b.timestamp - a.timestamp);
+        });
+
+        // Karte initial updaten
+        updateMap(Number(timeSlider.value));
+    }
+    catch (err) {
+        console.error("Fetch-Error (Metrics):", err);
+    }
+}
 
     // 3) Karte updaten auf Basis des Sliders
     function updateMap(timeIndex) {
