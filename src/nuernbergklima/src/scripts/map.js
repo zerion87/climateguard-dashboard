@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 1) Sensor-Metadaten laden
     async function loadSensorMetadata() {
-        const devicesUrl = "https://api.quantum.hackerban.de/v2/devices?tag=Annapark";
+        const devicesUrl = "https://api.quantum.hackerban.de/v2/devices?tag_name=Annapark";
         try {
             const resp = await fetch(devicesUrl);
             if (!resp.ok) {
