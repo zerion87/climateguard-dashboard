@@ -214,6 +214,31 @@ async function loadTemperatureData() {
         const result  = await resp.json();
         const entries = result.data;
 
+        console.group("🔍 Roh-Daten-Einträge");
+console.log(entries);
+console.groupEnd();
+
+console.group("🔍 Gruppierte Sensor-Daten");
+console.log(sensorData);
+console.groupEnd();
+
+// Höchste Temperatur pro Sensor ermitteln
+const maxPerSensor = Object.entries(sensorData).map(([id, readings]) => {
+    const temps = readings.map(r => r.temperature);
+    const maxTemp = Math.max(...temps);
+    const maxEntry = readings.find(r => r.temperature === maxTemp);
+    return { device_id: id, maxTemp, timestamp: maxEntry.timestamp };
+});
+console.group("🔍 Max-Temperaturen je Sensor");
+console.table(maxPerSensor);
+console.groupEnd();
+
+// Gesamt-Maximum über alle Sensoren
+const overall = maxPerSensor.reduce((prev, cur) =>
+    cur.maxTemp > prev.maxTemp ? cur : prev
+, { device_id: null, maxTemp: -Infinity, timestamp: null });
+console.log(`🔥 Höchste Temperatur insgesamt: ${overall.maxTemp}°C bei Device ${overall.device_id} um ${overall.timestamp}`);
+
         // Reset
         sensorData = {};
         timeStamps = [];
