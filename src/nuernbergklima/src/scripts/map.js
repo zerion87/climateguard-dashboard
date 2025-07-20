@@ -221,6 +221,9 @@ async function loadTemperatureData() {
         + `&end=${endIso}`
         + `&limit=100`;
 
+        console.log(startOfDay.toISOString());
+console.log(endOfDay.toISOString());
+
     // Alle Seiten sammeln
     let allEntries = [];
     let page       = 1;
