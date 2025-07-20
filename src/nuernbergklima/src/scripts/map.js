@@ -35,6 +35,21 @@ document.addEventListener("DOMContentLoaded", function () {
     const timeDisplay = document.getElementById("selected-time");
     timeSlider.min = 0;
 
+    // --------------------------------------------------
+    // Hilfsfunktion: Unix-Timestamp → Berlin-Zeit-String
+    function formatBerlinTime(tsSeconds) {
+      const date = new Date(tsSeconds * 1000);
+      return date.toLocaleString("de-DE", {
+        timeZone:   "Europe/Berlin",
+        year:       "numeric",
+        month:      "2-digit",
+        day:        "2-digit",
+        hour:       "2-digit",
+        minute:     "2-digit",
+        second:     "2-digit"
+      });
+    }
+
     // Hilfsfunktionen (unverändert)
     function normalizeTemperature(temp, minTemp = -10, maxTemp = 40) {
         return Math.max(0, Math.min(1, (temp - minTemp) / (maxTemp - minTemp)));
@@ -58,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
         marker.bindTooltip(`
             <b>Sensor:</b> ${name}<br>
             <b>Temperatur:</b> ${rounded}°C<br>
-            <b>Messzeit:</b> ${new Date(timestamp * 1000).toLocaleString()}
+            <b>Messzeit:</b> ${formatBerlinTime(timestamp)}
         `, { direction: 'top', offset: [0, -10] });
         markers.addLayer(marker);
     }
@@ -75,12 +90,9 @@ document.addEventListener("DOMContentLoaded", function () {
         // Update der Stat-Card "Sensoren aktiv"
         const statsGrid = document.querySelector('.stats-grid');
         if (statsGrid) {
-            const sensorStatCard = statsGrid.querySelector('.stat-card:nth-child(2)');
+            const sensorStatCard = statsGrid.querySelector('.stat-card:nth-child(2) h3');
             if (sensorStatCard) {
-                const h3Element = sensorStatCard.querySelector('h3');
-                if (h3Element) {
-                    h3Element.textContent = activeCount.toString();
-                }
+                sensorStatCard.textContent = activeCount;
             }
         }
         
@@ -104,12 +116,9 @@ document.addEventListener("DOMContentLoaded", function () {
         // Update der Stat-Card "Ø Temperatur heute"
         const statsGrid = document.querySelector('.stats-grid');
         if (statsGrid) {
-            const tempStatCard = statsGrid.querySelector('.stat-card:nth-child(1)');
+            const tempStatCard = statsGrid.querySelector('.stat-card:nth-child(1) h3');
             if (tempStatCard) {
-                const h3Element = tempStatCard.querySelector('h3');
-                if (h3Element) {
-                    h3Element.textContent = maxTemp !== null ? `${maxTemp.toFixed(1)}°C` : '--';
-                }
+                tempStatCard.textContent = maxTemp !== null ? `${maxTemp.toFixed(1)}°C` : '--';
             }
         }
         
@@ -146,12 +155,9 @@ document.addEventListener("DOMContentLoaded", function () {
         // 3. Stat-Card aktualisieren
         const statsGrid = document.querySelector('.stats-grid');
         if (statsGrid) {
-            const diffStatCard = statsGrid.querySelector('.stat-card:nth-child(3)');
+            const diffStatCard = statsGrid.querySelector('.stat-card:nth-child(3) h3');
             if (diffStatCard) {
-                const h3Element = diffStatCard.querySelector('h3');
-                if (h3Element) {
-                    h3Element.textContent = maxDiff !== null ? `${maxDiff.toFixed(1)}°C` : '--';
-                }
+                diffStatCard.textContent = maxDiff !== null ? `${maxDiff.toFixed(1)}°C` : '--';
             }
         }
         console.log(`Größter Temperaturunterschied in 10-Minuten-Intervallen: ${maxDiff}`);
@@ -169,6 +175,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             const result = await resp.json();
             sensors = {};
+
+            // Nur Devices mit Lat/Lon übernehmen
             result.data.forEach(dev => {
                 if (dev.latitude !== null && dev.longitude !== null) {
                     sensors[dev.device_id] = {
@@ -178,108 +186,96 @@ document.addEventListener("DOMContentLoaded", function () {
                     };
                 }
             });
+
+            const count = Object.keys(sensors).length;
+            if (count === 0) {
+                console.warn("Keine gültigen Devices mit Tag 'Annapark' und Geodaten gefunden.");
+            } else {
+                console.log(`${count} Devices mit Geodaten geladen.`);
+            }
         } catch (err) {
             console.error("Fetch-Error (Metadata):", err);
         }
     }
 
-// 2) Temperatur-Daten laden und Karte updaten (nur heute, nur vorher geladene Sensors)
-async function loadTemperatureData() {
-    // Sensoren sicherstellen
-    const deviceIds = Object.keys(sensors);
-    if (deviceIds.length === 0) {
-        console.warn("Keine Sensoren vorhanden. Bitte erst loadSensorMetadata() aufrufen.");
-        return;
-    }
-
-    // Zeitraum: Anfang und Ende des aktuellen Tages
-    const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const endOfDay   = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
-    const startIso   = startOfDay.toISOString();
-    const endIso     = endOfDay.toISOString();
-
-    // Metrics-Request mit device_ids + Zeitfilter
-    const metricsUrl = `https://api.quantum.hackerban.de/v2/metrics`
-        + `?device_ids=${deviceIds.join(",")}`
-        + `&start=${encodeURIComponent(startIso)}`
-        + `&end=${encodeURIComponent(endIso)}`;
-
-    try {
-        const resp = await fetch(metricsUrl);
-        if (!resp.ok) {
-            console.error("Fehler beim Abruf der Metriken:", await resp.text());
+    // 2) Temperatur-Daten laden und Karte updaten (nur heute, nur vorher geladene Sensors)
+    async function loadTemperatureData() {
+        // Sensoren sicherstellen
+        const deviceIds = Object.keys(sensors);
+        if (deviceIds.length === 0) {
+            console.warn("Keine Sensoren vorhanden. Bitte erst loadSensorMetadata() aufrufen.");
             return;
         }
-        const result  = await resp.json();
-        const entries = result.data;
 
-        console.group("🔍 Roh-Daten-Einträge");
-console.log(entries);
-console.groupEnd();
+        // Zeitraum: Anfang und Ende des aktuellen Tages
+        const now = new Date();
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const endOfDay   = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
+        const startIso   = startOfDay.toISOString();
+        const endIso     = endOfDay.toISOString();
 
-console.group("🔍 Gruppierte Sensor-Daten");
-console.log(sensorData);
-console.groupEnd();
+        // Metrics-Request mit device_ids + Zeitfilter
+        const metricsUrl = `https://api.quantum.hackerban.de/v2/metrics`
+            + `?device_ids=${deviceIds.join(",")}`
+            + `&start=${encodeURIComponent(startIso)}`
+            + `&end=${encodeURIComponent(endIso)}`;
 
-// Höchste Temperatur pro Sensor ermitteln
-const maxPerSensor = Object.entries(sensorData).map(([id, readings]) => {
-    const temps = readings.map(r => r.temperature);
-    const maxTemp = Math.max(...temps);
-    const maxEntry = readings.find(r => r.temperature === maxTemp);
-    return { device_id: id, maxTemp, timestamp: maxEntry.timestamp };
-});
-console.group("🔍 Max-Temperaturen je Sensor");
-console.table(maxPerSensor);
-console.groupEnd();
-
-// Gesamt-Maximum über alle Sensoren
-const overall = maxPerSensor.reduce((prev, cur) =>
-    cur.maxTemp > prev.maxTemp ? cur : prev
-, { device_id: null, maxTemp: -Infinity, timestamp: null });
-console.log(`🔥 Höchste Temperatur insgesamt: ${overall.maxTemp}°C bei Device ${overall.device_id} um ${overall.timestamp}`);
-
-        // Reset
-        sensorData = {};
-        timeStamps = [];
-
-        // Einträge gruppieren (nur für IDs, die in sensors existieren)
-        entries.forEach(({ device_id, temperature, timestamp_server }) => {
-            if (!(device_id in sensors)) return;
-
-            const ts   = timestamp_server;
-            const temp = parseFloat(temperature);
-            if (!sensorData[device_id]) sensorData[device_id] = [];
-            sensorData[device_id].push({ timestamp: ts, temperature: temp });
-
-            if (!timeStamps.includes(ts)) {
-                timeStamps.push(ts);
+        try {
+            const resp = await fetch(metricsUrl);
+            if (!resp.ok) {
+                console.error("Fehler beim Abruf der Metriken:", await resp.text());
+                return;
             }
-        });
+            const result  = await resp.json();
+            const entries = result.data;
 
-        // Zeitstempel sortieren und Slider-Range setzen
-        timeStamps.sort((a, b) => a - b);
-        timeSlider.max   = timeStamps.length - 1;
-        timeSlider.value = timeSlider.max;
+            // Debug-Ausgaben (optional)
+            console.group("🔍 Roh-Daten-Einträge");
+            console.log(entries);
+            console.groupEnd();
+            console.group("🔍 Gruppierte Sensor-Daten (vorher)");
+            console.log(sensorData);
+            console.groupEnd();
 
-        // pro Sensor: readings sortieren (neuester zuerst)
-        Object.keys(sensorData).forEach(id => {
-            sensorData[id].sort((a, b) => b.timestamp - a.timestamp);
-        });
+            // Reset
+            sensorData = {};
+            timeStamps = [];
 
-        // Karte initial updaten
-        updateMap(Number(timeSlider.value));
+            // Einträge gruppieren (nur für IDs, die in sensors existieren)
+            entries.forEach(({ device_id, temperature, timestamp_server }) => {
+                if (!(device_id in sensors)) return;
+                const ts   = timestamp_server;
+                const temp = parseFloat(temperature);
+                if (!sensorData[device_id]) sensorData[device_id] = [];
+                sensorData[device_id].push({ timestamp: ts, temperature: temp });
+                if (!timeStamps.includes(ts)) {
+                    timeStamps.push(ts);
+                }
+            });
+
+            // Zeitstempel sortieren und Slider-Range setzen
+            timeStamps.sort((a, b) => a - b);
+            timeSlider.max   = timeStamps.length - 1;
+            timeSlider.value = timeSlider.max;
+
+            // pro Sensor: readings sortieren (neuester zuerst)
+            Object.keys(sensorData).forEach(id => {
+                sensorData[id].sort((a, b) => b.timestamp - a.timestamp);
+            });
+
+            // Karte initial updaten
+            updateMap(Number(timeSlider.value));
+        }
+        catch (err) {
+            console.error("Fetch-Error (Metrics):", err);
+        }
     }
-    catch (err) {
-        console.error("Fetch-Error (Metrics):", err);
-    }
-}
 
     // 3) Karte updaten auf Basis des Sliders
     function updateMap(timeIndex) {
         const idx   = Number(timeIndex);
         const selTs = timeStamps[idx];
-        timeDisplay.innerText = new Date(selTs * 1000).toLocaleString();
+        timeDisplay.innerText = formatBerlinTime(selTs);
 
         markers.clearLayers();
         heatmapLayer.setLatLngs([]);
@@ -289,17 +285,18 @@ console.log(`🔥 Höchste Temperatur insgesamt: ${overall.maxTemp}°C bei Devic
             const sel      = readings.find(r => r.timestamp <= selTs);
             if (!sel) return;
 
-            // hier nur die tatsächlich ältere Messung nehmen:
+            // Trend basierend auf vorheriger Messung
             const prev = readings.find(r => r.timestamp < sel.timestamp) || null;
             const trend = prev ? getTrendArrow(prev.temperature, sel.temperature) : "➖";
 
             const meta = sensors[sensorId];
-            if (!meta) return;  // kein Mapping vorhanden => überspringen
+            if (!meta) return;  
 
             addClusteredMarker(meta.lat, meta.lon, sel.temperature, meta.name, trend, sel.timestamp);
             heatmapLayer.addLatLng([meta.lat, meta.lon, normalizeTemperature(sel.temperature)]);
         });
 
+        // Beim ersten Laden Bounds setzen
         if (firstLoad) {
             const coords = Object.values(sensors).map(s => [s.lat, s.lon]);
             if (coords.length) {
@@ -309,11 +306,9 @@ console.log(`🔥 Höchste Temperatur insgesamt: ${overall.maxTemp}°C bei Devic
             firstLoad = false;
         }
         
-        // Update der aktiven Sensoren-Anzahl
+        // Statistiken aktualisieren
         updateActiveSensorsCount();
-        // Update der höchsten Temperatur
         updateHighestTemperature();
-        // Update des größten Temperaturunterschieds
         updateMaxTemperatureDifference();
     }
 
@@ -322,7 +317,7 @@ console.log(`🔥 Höchste Temperatur insgesamt: ${overall.maxTemp}°C bei Devic
 
     (async function init() {
         await loadSensorMetadata();      // 1x Metadata holen
-        await loadTemperatureData();     // erste Meterik-Daten und Karte zeichnen
-        setInterval(loadTemperatureData, 600000);  // dann alle 30 s nur die Metriken nachladen
+        await loadTemperatureData();     // erste Metrik-Daten und Karte zeichnen
+        setInterval(loadTemperatureData, 600000);  // alle 10 Minuten erneut Metriken nachladen
     })();
 });
