@@ -198,78 +198,98 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // 2) Temperatur-Daten laden und Karte updaten (nur heute, nur vorher geladene Sensors)
-    async function loadTemperatureData() {
-        // Sensoren sicherstellen
-        const deviceIds = Object.keys(sensors);
-        if (deviceIds.length === 0) {
-            console.warn("Keine Sensoren vorhanden. Bitte erst loadSensorMetadata() aufrufen.");
-            return;
-        }
+// 2) Temperatur-Daten laden und Karte updaten (nur heute, nur vorher geladene Sensors)
+async function loadTemperatureData() {
+    // Sensoren sicherstellen
+    const deviceIds = Object.keys(sensors);
+    if (deviceIds.length === 0) {
+        console.warn("Keine Sensoren vorhanden. Bitte erst loadSensorMetadata() aufrufen.");
+        return;
+    }
 
-        // Zeitraum: Anfang und Ende des aktuellen Tages
-        const now = new Date();
-        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const endOfDay   = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
-        const startIso   = startOfDay.toISOString();
-        const endIso     = endOfDay.toISOString();
+    // Zeitraum: Anfang und Ende des aktuellen Tages
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfDay   = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
+    const startIso   = encodeURIComponent(startOfDay.toISOString());
+    const endIso     = encodeURIComponent(endOfDay.toISOString());
 
-        // Metrics-Request mit device_ids + Zeitfilter
-        const metricsUrl = `https://api.quantum.hackerban.de/v2/metrics`
-            + `?device_ids=${deviceIds.join(",")}`
-            + `&start=${encodeURIComponent(startIso)}`
-            + `&end=${encodeURIComponent(endIso)}`;
+    // Basis-URL für Pagination-Requests
+    const baseUrl = `https://api.quantum.hackerban.de/v2/metrics`
+        + `?device_ids=${deviceIds.join(",")}`
+        + `&start=${startIso}`
+        + `&end=${endIso}`
+        + `&limit=100`;
 
-        try {
-            const resp = await fetch(metricsUrl);
+    // Alle Seiten sammeln
+    let allEntries = [];
+    let page       = 1;
+    let hasNext    = true;
+
+    try {
+        while (hasNext) {
+            const url  = `${baseUrl}&page=${page}`;
+            const resp = await fetch(url);
             if (!resp.ok) {
-                console.error("Fehler beim Abruf der Metriken:", await resp.text());
+                console.error(`Fehler beim Abruf der Metriken (Seite ${page}):`, await resp.text());
                 return;
             }
-            const result  = await resp.json();
-            const entries = result.data;
+            const result = await resp.json();
 
-            // Debug-Ausgaben (optional)
-            console.group("🔍 Roh-Daten-Einträge");
-            console.log(entries);
-            console.groupEnd();
-            console.group("🔍 Gruppierte Sensor-Daten (vorher)");
-            console.log(sensorData);
-            console.groupEnd();
+            // Daten anhängen
+            allEntries.push(...result.data);
 
-            // Reset
-            sensorData = {};
-            timeStamps = [];
-
-            // Einträge gruppieren (nur für IDs, die in sensors existieren)
-            entries.forEach(({ device_id, temperature, timestamp_server }) => {
-                if (!(device_id in sensors)) return;
-                const ts   = timestamp_server;
-                const temp = parseFloat(temperature);
-                if (!sensorData[device_id]) sensorData[device_id] = [];
-                sensorData[device_id].push({ timestamp: ts, temperature: temp });
-                if (!timeStamps.includes(ts)) {
-                    timeStamps.push(ts);
-                }
-            });
-
-            // Zeitstempel sortieren und Slider-Range setzen
-            timeStamps.sort((a, b) => a - b);
-            timeSlider.max   = timeStamps.length - 1;
-            timeSlider.value = timeSlider.max;
-
-            // pro Sensor: readings sortieren (neuester zuerst)
-            Object.keys(sensorData).forEach(id => {
-                sensorData[id].sort((a, b) => b.timestamp - a.timestamp);
-            });
-
-            // Karte initial updaten
-            updateMap(Number(timeSlider.value));
+            // Pagination prüfen
+            const pag = result.pagination;
+            hasNext = pag.has_next;
+            console.log(`Geladene Seite ${pag.page}/${pag.total_pages}, has_next=${pag.has_next}`);
+            page += 1;
         }
-        catch (err) {
-            console.error("Fetch-Error (Metrics):", err);
-        }
+
+        const entries = allEntries;
+
+        // Debug-Ausgaben (optional)
+        console.group("🔍 Roh-Daten-Einträge");
+        console.log(entries);
+        console.groupEnd();
+        console.group("🔍 Gruppierte Sensor-Daten (vorher)");
+        console.log(sensorData);
+        console.groupEnd();
+
+        // Reset
+        sensorData = {};
+        timeStamps = [];
+
+        // Einträge gruppieren (nur für IDs, die in sensors existieren)
+        entries.forEach(({ device_id, temperature, timestamp_server }) => {
+            if (!(device_id in sensors)) return;
+            const ts   = timestamp_server;
+            const temp = parseFloat(temperature);
+            if (!sensorData[device_id]) sensorData[device_id] = [];
+            sensorData[device_id].push({ timestamp: ts, temperature: temp });
+            if (!timeStamps.includes(ts)) {
+                timeStamps.push(ts);
+            }
+        });
+
+        // Zeitstempel sortieren und Slider-Range setzen
+        timeStamps.sort((a, b) => a - b);
+        timeSlider.max   = timeStamps.length - 1;
+        timeSlider.value = timeSlider.max;
+
+        // pro Sensor: readings sortieren (neuester zuerst)
+        Object.keys(sensorData).forEach(id => {
+            sensorData[id].sort((a, b) => b.timestamp - a.timestamp);
+        });
+
+        // Karte initial updaten
+        updateMap(Number(timeSlider.value));
     }
+    catch (err) {
+        console.error("Fetch-Error (Metrics):", err);
+    }
+}
+
 
     // 3) Karte updaten auf Basis des Sliders
     function updateMap(timeIndex) {
