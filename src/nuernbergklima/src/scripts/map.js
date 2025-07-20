@@ -223,6 +223,9 @@ async function loadTemperatureData() {
         + `&max_date=${maxDateIso}`
         + `&limit=100`;
 
+        console.log(startOfDay.toISOString());
+        console.log(endOfDay.toISOString());
+
     let allEntries = [];
     let page       = 1;
     let hasNext    = true;
