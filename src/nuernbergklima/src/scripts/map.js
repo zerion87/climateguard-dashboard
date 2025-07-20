@@ -207,29 +207,28 @@ async function loadTemperatureData() {
         return;
     }
 
-    // Zeitraum: Anfang und Ende des aktuellen Tages
-    const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const endOfDay   = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
-    const startIso   = encodeURIComponent(startOfDay.toISOString());
-    const endIso     = encodeURIComponent(endOfDay.toISOString());
+    // Zeitraum: Anfang und Ende des aktuellen Berliner Tages in UTC convertiert
+    const now      = new Date();
+    const startOfDayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startUtc = new Date(startOfDayLocal.getTime() - startOfDayLocal.getTimezoneOffset() * 60000);
+    const endUtc   = new Date(startUtc.getTime() + 24 * 60 * 60 * 1000);
 
-    // Basis-URL für Pagination-Requests
+    const minDateIso = encodeURIComponent(startUtc.toISOString());
+    const maxDateIso = encodeURIComponent(endUtc.toISOString());
+
+    // Basis-URL mit den richtigen Parametern aus der Doku
     const baseUrl = `https://api.quantum.hackerban.de/v2/metrics`
         + `?device_ids=${deviceIds.join(",")}`
-        + `&start=${startIso}`
-        + `&end=${endIso}`
+        + `&min_date=${minDateIso}`
+        + `&max_date=${maxDateIso}`
         + `&limit=100`;
 
-        console.log(startOfDay.toISOString());
-console.log(endOfDay.toISOString());
-
-    // Alle Seiten sammeln
     let allEntries = [];
     let page       = 1;
     let hasNext    = true;
 
     try {
+        // Pagination-Schleife
         while (hasNext) {
             const url  = `${baseUrl}&page=${page}`;
             const resp = await fetch(url);
@@ -239,53 +238,42 @@ console.log(endOfDay.toISOString());
             }
             const result = await resp.json();
 
-            // Daten anhängen
+            // Daten sammeln
             allEntries.push(...result.data);
 
-            // Pagination prüfen
+            // pagination-Info auswerten
             const pag = result.pagination;
+            console.log(`Seite ${pag.page}/${pag.total_pages} geladen – has_next=${pag.has_next}`);
             hasNext = pag.has_next;
-            console.log(`Geladene Seite ${pag.page}/${pag.total_pages}, has_next=${pag.has_next}`);
             page += 1;
         }
 
-        const entries = allEntries;
-
-        // Debug-Ausgaben (optional)
+        // Jetzt allEntries weiterverarbeiten wie zuvor:
+        // → Reset, Gruppieren, Sortieren, Karte updaten
         console.group("🔍 Roh-Daten-Einträge");
-        console.log(entries);
+        console.log(allEntries);
         console.groupEnd();
         console.group("🔍 Gruppierte Sensor-Daten (vorher)");
         console.log(sensorData);
         console.groupEnd();
 
-        // Reset
         sensorData = {};
         timeStamps = [];
-
-        // Einträge gruppieren (nur für IDs, die in sensors existieren)
-        entries.forEach(({ device_id, temperature, timestamp_server }) => {
+        allEntries.forEach(({ device_id, temperature, timestamp_server }) => {
             if (!(device_id in sensors)) return;
             const ts   = timestamp_server;
             const temp = parseFloat(temperature);
             if (!sensorData[device_id]) sensorData[device_id] = [];
             sensorData[device_id].push({ timestamp: ts, temperature: temp });
-            if (!timeStamps.includes(ts)) {
-                timeStamps.push(ts);
-            }
+            if (!timeStamps.includes(ts)) timeStamps.push(ts);
         });
 
-        // Zeitstempel sortieren und Slider-Range setzen
         timeStamps.sort((a, b) => a - b);
         timeSlider.max   = timeStamps.length - 1;
         timeSlider.value = timeSlider.max;
-
-        // pro Sensor: readings sortieren (neuester zuerst)
         Object.keys(sensorData).forEach(id => {
             sensorData[id].sort((a, b) => b.timestamp - a.timestamp);
         });
-
-        // Karte initial updaten
         updateMap(Number(timeSlider.value));
     }
     catch (err) {
