@@ -207,14 +207,16 @@ async function loadTemperatureData() {
         return;
     }
 
-    // Zeitraum: Anfang und Ende des aktuellen Berliner Tages in UTC convertiert
-    const now      = new Date();
-    const startOfDayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const startUtc = new Date(startOfDayLocal.getTime() - startOfDayLocal.getTimezoneOffset() * 60000);
-    const endUtc   = new Date(startUtc.getTime() + 24 * 60 * 60 * 1000);
+// Zeitraum: Anfang und Ende des aktuellen Berliner Tages
+const now         = new Date();
+const startLocal  = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+// Einen Tag drauf für Ende
+const endLocal    = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
 
-    const minDateIso = encodeURIComponent(startUtc.toISOString());
-    const maxDateIso = encodeURIComponent(endUtc.toISOString());
+// ISO-Strings (intern in UTC) und URL-encodiert
+const minDateIso  = encodeURIComponent(startLocal.toISOString()); // z.B. "2025-07-19T22:00:00.000Z"
+const maxDateIso  = encodeURIComponent(endLocal.toISOString());   // z.B. "2025-07-20T22:00:00.000Z"
+
 
     // Basis-URL mit den richtigen Parametern aus der Doku
     const baseUrl = `https://api.quantum.hackerban.de/v2/metrics`
