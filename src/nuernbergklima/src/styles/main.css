@@ -356,8 +356,8 @@ p {
 .logo-grid img {
   max-height: 55px; /* Höhe der Sponsoren-Logos anpassen */
   max-width: 200px;
-  filter: grayscale(100%);
-  opacity: 0.7;
+   /*filter: grayscale(100%);*/
+  /*opacity: 0.7;*/
   transition: all 0.2s ease-in-out;
 }
 .logo-grid img:hover {
@@ -546,3 +546,25 @@ p {
 }
 @media (min-width: 1024px) {
   .feature-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* --- Impressum zentrieren (Override) --- */
+.impressum-section {
+  text-align: center; /* zentriert Überschrift und Inline-Elemente */
+}
+
+.impressum-section .container {
+  /* bestehendes max-width bleibt erhalten; die Container-Klasse zentriert bereits per margin:auto */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.impressum-section h2 {
+  margin-bottom: 1rem;
+}
+
+.impressum-section p {
+  text-align: center; /* überschreibt die bisherige left-Ausrichtung */
+  margin-left: auto;
+  margin-right: auto;
+}

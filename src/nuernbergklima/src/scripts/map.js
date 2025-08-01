@@ -355,6 +355,7 @@ const maxDateIso  = encodeURIComponent(endLocal.toISOString());   // z.B. "2025-
         updateActiveSensorsCount();
         updateHighestTemperature();
         updateMaxTemperatureDifference();
+        updateLowestTemperature();
     }
 
     // Event-Listener & Initialisierung
