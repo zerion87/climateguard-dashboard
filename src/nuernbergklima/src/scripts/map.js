@@ -341,15 +341,19 @@ const maxDateIso  = encodeURIComponent(endLocal.toISOString());   // z.B. "2025-
             heatmapLayer.addLatLng([meta.lat, meta.lon, normalizeTemperature(sel.temperature)]);
         });
 
-        // Beim ersten Laden Bounds setzen
-        if (firstLoad) {
-            const coords = Object.values(sensors).map(s => [s.lat, s.lon]);
-            if (coords.length) {
-                const bounds = new L.LatLngBounds(coords);
-                map.fitBounds(bounds, { padding: [50, 50] });
-            }
-            firstLoad = false;
+// Beim ersten Laden Bounds auf die sichtbaren Marker setzen
+if (firstLoad) {
+    const b = markers.getBounds(); // MarkerCluster-Bounds
+    if (b && b.isValid()) {
+        // Wenn nur 1 Marker: sinnvoll näher ran, sonst fitBounds
+        if (b.getNorthEast().equals(b.getSouthWest())) {
+            map.setView(b.getCenter(), 15); // ggf. Wunschzoom anpassen
+        } else {
+            map.fitBounds(b, { padding: [50, 50], maxZoom: 17 });
         }
+    }
+    firstLoad = false;
+}
         
         // Statistiken aktualisieren
         updateActiveSensorsCount();
