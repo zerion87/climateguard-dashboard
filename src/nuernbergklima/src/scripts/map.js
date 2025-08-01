@@ -126,6 +126,38 @@ document.addEventListener("DOMContentLoaded", function () {
         return maxTemp;
     }
 
+    // Funktion zum Finden der niedrigsten gemessenen Temperatur und Update der Stat-Card
+function updateLowestTemperature() {
+    let minTemp = null;
+
+    // Über alle Sensor-Arrays iterieren und minimale Temperatur bestimmen
+    Object.values(sensorData || {}).forEach(readings => {
+        if (Array.isArray(readings)) {
+            readings.forEach(r => {
+                if (typeof r.temperature === 'number' && !isNaN(r.temperature)) {
+                    if (minTemp === null || r.temperature < minTemp) {
+                        minTemp = r.temperature;
+                    }
+                }
+            });
+        }
+    });
+
+    // Update der Stat-Card "Tiefstwert heute"
+    const statsGrid = document.querySelector('.stats-grid');
+    if (statsGrid) {
+        // Bevorzugt eine explizit markierte Karte, sonst 2. Karte als Fallback
+        const target = statsGrid.querySelector('[data-stat="min-temp"] h3')
+                  || statsGrid.querySelector('.stat-card:nth-child(4) h3');
+        if (target) {
+            target.textContent = (minTemp !== null) ? `${minTemp.toFixed(1)}°C` : '--';
+        }
+    }
+
+    console.log(`Niedrigste gemessene Temperatur: ${minTemp}`);
+    return minTemp;
+}
+
     // Funktion zum Finden des größten Temperaturunterschieds in 10-Minuten-Intervallen und Update der Stat-Card
     function updateMaxTemperatureDifference() {
         // 1. Alle Messwerte in 10-Minuten-Buckets gruppieren

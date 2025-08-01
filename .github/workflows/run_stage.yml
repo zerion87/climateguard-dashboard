@@ -1,9 +1,9 @@
 name: the_floor_is_lava stage deployment
 
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   workflow_dispatch:
 
 jobs:

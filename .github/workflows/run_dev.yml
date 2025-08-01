@@ -1,9 +1,9 @@
 name: climateguard stage deployment
 
 on:
-  push:
-    branches:
-      - website_11ty
+  # push:
+  #   branches:
+  #     - website_11ty
   workflow_dispatch:
 
 jobs:
