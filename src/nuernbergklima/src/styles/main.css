@@ -333,6 +333,54 @@ p {
   text-align: center;
 }
 
+.sponsors-section {
+  text-align: center;
+}
+.sponsors-section {
+  background-color: var(--bg-white);
+}
+.sponsors-section h2, .info-section h2 {
+  margin-top: 0;
+  color: var(--text-medium);
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+.logo-grid {
+  margin-top: 2.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4rem;
+}
+.logo-grid img {
+  max-height: 55px; /* Höhe der Sponsoren-Logos anpassen */
+  max-width: 200px;
+  filter: grayscale(100%);
+  opacity: 0.7;
+  transition: all 0.2s ease-in-out;
+}
+.logo-grid img:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+/* --- Impressum Section --- */
+.impressum-section {
+  background-color: var(--bg-white);
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+.impressum-section .container {
+  max-width: 48rem;
+}
+.impressum-section p {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--text-medium);
+  text-align: left;
+}
+
 /* --- Footer --- */
 .footer {
   background-color: var(--bg-dark);

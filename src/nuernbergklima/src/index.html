@@ -6,6 +6,11 @@
   <meta name="description" content="NuernbergKlima – Bürgerportal zur Verbesserung des Stadtklimas in Nürnberg mit Echtzeitdaten, interaktiven Karten und Bürgerbeteiligung.">
   <title>NuernbergKlima – Bürgerportal</title>
 
+
+<link rel="icon" href="./img/favicon.ico" type="image/x-icon">
+<link rel="icon" href="./img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="./img/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="./img/apple-touch-icon.png">
 <!-- Leaflet-Styles -->
 <link rel="stylesheet" href="/leaflet/leaflet.css" />
 <link rel="stylesheet" href="/leaflet/MarkerCluster.css" />
@@ -60,12 +65,8 @@
       <div class="container">
         <h1>Gemeinsam für ein besseres Stadtklima</h1>
         <p>
-          Das Bürgerportal NuernbergKlima sammelt und visualisiert Echtzeit-Klimadaten aus ganz Nürnberg. Machen Sie mit und gestalten Sie eine grünere, gesündere Zukunft für unsere Stadt.
+          NuernbergKlima.de sammelt und visualisiert Echtzeit-Klimadaten aus Nürnberg. Sieh nach, wo es besonders heiß ist und wo es kühlere Plätze gibt!
         </p>
-        <div class="hero-buttons">
-          <a href="#mitmachen" class="btn btn-primary" style="padding: 0.75rem 2rem; font-size: 1.125rem;">Jetzt Mitmachen</a>
-          <a href="#map-section" class="btn btn-secondary" style="padding: 0.75rem 2rem; font-size: 1.125rem;">Daten entdecken</a>
-        </div>
       </div>
     </section>
 
@@ -75,7 +76,6 @@
           <div class="stat-card"><h3>--.-°C</h3><span>höchste Temperatur heute</span></div>
           <div class="stat-card"><h3>--</h3><span>Sensoren aktiv</span></div>
           <div class="stat-card"><h3>--.- °C</h3><span>größter Temperaturunterschied heute</span></div>
-          <div class="stat-card"><h3>678</h3><span>Besucher heute</span></div>
         </div>
         <div id="map"></div>
         <div class="time-control" style="margin-top:1rem; display:flex; align-items:center; gap:1rem;">
@@ -95,55 +95,56 @@
     <section id="about" class="about-section">
       <div class="container about-grid">
         <div class="content">
-          <h2>Was ist NuernbergKlima?</h2>
+          <h2>Was ist NuernbergKlima.de?</h2>
           <p>
-            NuernbergKlima ist eine von Bürgern getragene Initiative, die das Ziel hat, das städtische Mikroklima transparent zu machen. Durch ein Netzwerk von Sensoren, die von Freiwilligen in der ganzen Stadt betrieben werden, erfassen wir live Daten zu Temperatur, Luftfeuchtigkeit und Luftqualität.
-          </p>
-          <p>
-            Unsere offene Plattform bereitet diese Daten auf und stellt sie allen zur Verfügung. So können wir gemeinsam Problemzonen identifizieren, die Auswirkungen von Grünflächen analysieren und fundierte Entscheidungen für eine klimaresiliente Stadtentwicklung treffen.
-          </p>
-          <a href="#" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">Mehr über unsere Mission</a>
+            Mit diesem Projekt möchten wir gemeinsam herausfinden, wie warm (oder kalt) es an verschiedenen Orten in der Südstadt ist.
+        </p>
+        
+        <h2>Wieso machen wir das?</h2>
+        <p>
+            Extreme Hitze betrifft immer mehr Städte. Die Temperatur kann aber sogar innerhalb eines Viertels ganz unterschiedlich sein, z.B. je nachdem, wie viel Grün es gibt oder wie eng die Bebauung ist. Unsere Sensoren messen daher die Temperatur an verschiedenen Standorten. Die Daten werden anonym erfasst und auf unserer Karte in Echtzeit visualisiert.
+        </p>
+        
+        <h2>Was passiert mit den Daten?</h2>
+        <p>
+            Alle Messwerte sind öffentlich einsehbar. So können alle sehen, wo es besonders heiß wird und wo es kühler bleibt. Damit wollen wir sichtbar machen, welche Ecken unseres Viertels besonders mit Hitze zu kämpfen haben – und dabei helfen, gemeinsam Lösungen zu finden, um unsere Nachbarschaft klimafreundlicher zu gestalten.
+        </p>
+        
+        <h2>Wer macht das?</h2>
+        <p>
+            Das Projekt ist eine Initiative von Hackerbande Nürnberg bestehend aus Leuten wie dir. Wir freuen uns über Unterstützung oder Feedback!
+        
         </div>
       </div>
     </section>
     
-    <section id="mitmachen" class="cta-section">
-        <div class="container">
-            <div class="cta-box">
-                <h2>Werden Sie Teil der Klimabewegung</h2>
-                <p>
-                    Setzen Sie ein Zeichen und helfen Sie uns, Nürnberg lebenswerter zu machen. Ob Sie einen Sensor aufstellen, Daten analysieren oder die Idee verbreiten – jeder Beitrag zählt.
-                </p>
-                <a href="#kontakt" class="btn" style="padding: 0.75rem 2rem;">Jetzt anmelden & mitmachen</a>
-            </div>
-        </div>
-    </section>
+    
 
     <section id="kontakt" class="contact-section">
-      <div class="container contact-wrapper">
-        <div class="header">
-            <h2>Kontakt aufnehmen</h2>
-            <p>Haben Sie Fragen, Feedback oder möchten Sie mitarbeiten? Schreiben Sie uns!</p>
-        </div>
-        <form action="#" class="contact-form">
-          <div>
-            <label for="name">Ihr Name</label>
-            <input id="name" type="text" placeholder="Max Mustermann" required />
-          </div>
-          <div>
-            <label for="email">Ihre E-Mail</label>
-            <input id="email" type="email" placeholder="max.mustermann@email.de" required />
-          </div>
-          <div>
-            <label for="message">Ihre Nachricht</label>
-            <textarea id="message" rows="4" placeholder="Ihre Nachricht..."></textarea>
-          </div>
-          <div class="submit-button">
-            <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2.5rem;">Absenden</button>
-          </div>
-        </form>
+      <div class="container">
+        <p>Das Projekt wird im Rahmen von „Was wäre,  wenn...?“ von der Nationalen Stadtentwicklungspolitik durch das Bundesministerium für Wohnen, Stadtenwicklung und Bauwesen (BMWSB) gefördert.</p>
       </div>
     </section>
+
+    <section class="sponsors-section">
+      <div class="container">
+          <h2>Das Projekt wird im Rahmen von „Was wäre,  wenn...?“ von der Nationalen Stadtentwicklungspolitik durch das Bundesministerium für Wohnen, Stadtenwicklung und Bauwesen (BMWSB) gefördert.</h2>
+          <div class="logo-grid">
+              <a href="https://www.waswaerewenn2035.de/" target="_blank" rel="noopener noreferrer">
+                  <img src="/img/UL_WWW_Wortmarke_Schwarz+Slogan.png" alt="Waswarewenn2035">
+              </a>
+              <a href="https://www.urbanlab-nuernberg.de/" target="_blank" rel="noopener noreferrer">
+                  <img src="/img/UL-Logo.png" alt="Urbanlab Nürnberg">
+              </a>
+              <a href="https://www.nationale-stadtentwicklungspolitik.de/" target="_blank" rel="noopener noreferrer">
+                <img src="/img/NSP_Logo_DE_CMYK.jpg" alt="Nationale Stadtentwicklungspolitik">
+            </a>
+            <a href="https://www.bmwsb.bund.de/" target="_blank" rel="noopener noreferrer">
+              <img src="/img/bmwsb_2021_WebSVG_de.svg" alt="Bundesministerium für Wohnen, Stadtentwicklung und Bauwesen">
+          </a>
+          </div>
+      </div>
+  </section>
   </main>
 
   <footer class="footer">
