@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="de" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Das Temperatur-Projekt in der Nürnberger Südstadt. Entdecke Live-Klimadaten aus deinem Viertel.">
+  <title>Nuernbergklima.de - Was ist das?</title>
+
+  <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="../img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="../img/favicon-16.png" sizes="16x16" type="image/png">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
+  <style>
+    /* --- Base & Variables --- */
+    :root {
+      --primary-light: #14A2AB;
+      --primary-dark:  #0B8AB8;
+      --text-dark: #1f2937; /* gray-800 */
+      --text-medium: #4b5563; /* gray-600 */
+      --text-light: #f9fafb; /* gray-50 */
+      --bg-light: #f9fafb; /* gray-50 */
+      --bg-white: #ffffff;
+      --bg-dark: #1f2937; /* gray-800 */
+    }
+
+    /* Local Poppins Fonts (Annahme: Pfade sind korrekt) */
+    @font-face {
+      font-family: 'Poppins';
+      font-style: normal;
+      font-weight: 300;
+      src: url('/fonts/Poppins-Light.ttf') format('truetype');
+    }
+    @font-face {
+      font-family: 'Poppins';
+      font-style: normal;
+      font-weight: 400;
+      src: url('/fonts/Poppins-Regular.ttf') format('truetype');
+    }
+    @font-face {
+      font-family: 'Poppins';
+      font-style: normal;
+      font-weight: 600;
+      src: url('/fonts/Poppins-SemiBold.ttf') format('truetype');
+    }
+
+    /* --- General Styling --- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: var(--text-dark);
+      background-color: var(--bg-light);
+    }
+    .container {
+      max-width: 1280px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    section {
+      padding-top: 3rem;
+      padding-bottom: 3rem;
+    }
+    h1 {
+      font-size: 2.25rem; /* 36px */
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: #111827; /* gray-900 */
+    }
+    h2 {
+      font-size: 1.875rem; /* 30px */
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      margin-bottom: 1rem;
+    }
+    p {
+      line-height: 1.6;
+      max-width: 56rem; /* max-w-3xl */
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    /* --- Header & Logo --- */
+    .site-header {
+        background-color: var(--bg-white);
+        padding: 1rem 0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .logo-container {
+        display: flex;
+        justify-content: center;
+    }
+    .logo-container img {
+        max-width: 450px;
+        height: auto;
+    }
+
+    /* --- Content Section --- */
+    .content-section {
+      text-align: center;
+      background: linear-gradient(135deg, rgba(20,162,171,.1), rgba(11,138,184,.1));
+      padding-top: 4rem;
+      padding-bottom: 4rem;
+    }
+    .content-section .container {
+        max-width: 56rem; /* max-w-3xl für bessere Lesbarkeit */
+    }
+    .content-section .sensor-image {
+        max-width: 200px;
+        margin-bottom: 2.5rem;
+        background-color: rgba(255, 255, 255, 0);
+
+    }
+    .content-section h1 {
+        margin-bottom: 1rem;
+    }
+    .content-section p {
+        color: var(--text-medium);
+        text-align: left; /* Bessere Lesbarkeit für längere Texte */
+        margin-bottom: 2rem;
+    }
+     .content-section h2 {
+        margin-top: 2.5rem;
+     }
+    .gradient-text {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .cta-button {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+        color: var(--text-light);
+        padding: 0.875rem 2.5rem; /* 14px 40px */
+        border-radius: 9999px; /* pill shape */
+        text-decoration: none;
+        font-weight: 600;
+        margin-top: 2rem;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .cta-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+    }
+
+
+    /* --- Info & Sponsors Section --- */
+    .info-section, .sponsors-section {
+        text-align: center;
+    }
+    .sponsors-section {
+        background-color: var(--bg-white);
+    }
+    .sponsors-section h2, .info-section h2 {
+        margin-top: 0;
+        color: var(--text-medium);
+        font-size: 1.25rem;
+        font-weight: 400;
+    }
+    .logo-grid {
+        margin-top: 2.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 4rem;
+    }
+    .logo-grid img {
+        max-height: 55px; /* Höhe der Sponsoren-Logos anpassen */
+        max-width: 200px;
+        filter: grayscale(100%);
+        opacity: 0.7;
+        transition: all 0.2s ease-in-out;
+    }
+    .logo-grid img:hover {
+        filter: grayscale(0%);
+        opacity: 1;
+    }
+
+    /* --- Impressum Section --- */
+    .impressum-section {
+        background-color: var(--bg-white);
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+    .impressum-section .container {
+        max-width: 48rem;
+    }
+    .impressum-section p {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: var(--text-medium);
+        text-align: left;
+    }
+    
+    /* --- Footer --- */
+    .footer {
+      background-color: var(--bg-dark);
+      color: #9ca3af; /* gray-400 */
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    /* --- Responsive Design --- */
+    @media (min-width: 768px) {
+      h1 {
+        font-size: 3.75rem;
+      }
+      h2 {
+        font-size: 2.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+        <div class="logo-container">
+            <img src="../img/logo_transparent.png" alt="Logo des Projekts">
+        </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="content-section">
+      <div class="container">
+        
+        <img src="./schutzgehaeuse.png" alt="Temperatursensor in einem Strahlungsschutzgehäuse" class="sensor-image">
+
+        <h1><span class="gradient-text">Was ist das?</span></h1>
+        <p style="text-align: center; font-size: 1.25rem; color: var(--text-dark);">
+            Willkommen beim Temperatur-Projekt in der Nürnberger Südstadt!<br>
+            Du hast einen unserer Temperatur-Sensoren entdeckt – toll, dass Du neugierig bist!
+        </p>
+
+        <p>
+            Mit diesem Projekt möchten wir gemeinsam herausfinden, wie warm (oder kalt) es an verschiedenen Orten in der Südstadt ist.
+        </p>
+        
+        <h2>Wieso machen wir das?</h2>
+        <p>
+            Extreme Hitze betrifft immer mehr Städte. Die Temperatur kann aber sogar innerhalb eines Viertels ganz unterschiedlich sein, z.B. je nachdem, wie viel Grün es gibt oder wie eng die Bebauung ist. Unsere Sensoren messen daher die Temperatur an verschiedenen Standorten. Die Daten werden anonym erfasst und auf unserer Karte in Echtzeit visualisiert.
+        </p>
+        
+        <h2>Was passiert mit den Daten?</h2>
+        <p>
+            Alle Messwerte sind öffentlich einsehbar. So können alle sehen, wo es besonders heiß wird und wo es kühler bleibt. Damit wollen wir sichtbar machen, welche Ecken unseres Viertels besonders mit Hitze zu kämpfen haben – und dabei helfen, gemeinsam Lösungen zu finden, um unsere Nachbarschaft klimafreundlicher zu gestalten.
+        </p>
+        
+        <h2>Wer macht das?</h2>
+        <p>
+            Das Projekt ist eine Initiative von Hackerbande Nürnberg bestehend aus Leuten wie dir. Wir freuen uns über Unterstützung oder Feedback!
+        </p>
+
+        <h2>Auf gehts!</h2>
+        <p style="text-align: center;">
+            Jetzt schau dich um und erfahre mehr über die Temperaturen in deinem Viertel!
+        </p>
+
+        <a href="https://nuernbergklima.de" class="cta-button">Zur Karte!</a>
+        
+      </div>
+    </section>
+
+    <section class="info-section">
+        <div class="container">
+            <p>
+                Hierbei handelt es sich um ein Pilotprojekt im Rahmen der Nationalen Stadtentwicklung des Bundesministerium für Wohnen, Stadtentwicklung und Bauwesen
+            </p>
+        </div>
+    </section>
+
+    <section class="sponsors-section">
+        <div class="container">
+            <h2>Gefördert durch</h2>
+            <div class="logo-grid">
+                <a href="https://www.waswaerewenn2035.de/" target="_blank" rel="noopener noreferrer">
+                    <img src="../img/UL_WWW_Wortmarke_Schwarz+Slogan.png" alt="Sponsor Logo Was wäre wenn 2035">
+                </a>
+                <a href="https://www.urbanlab-nuernberg.de/" target="_blank" rel="noopener noreferrer">
+                    <img src="../img/UL-Logo.png" alt="Sponsor Logo UrbanLab Nürnberg">
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="impressum-section">
+        <div class="container">
+            <h2>Impressum</h2>
+            
+            <p>
+                Koitka, Mirring, Schädlich GbR<br>
+                Flaschenhofstraße 4<br>
+                90402 Nürnberg<br>
+            </p>
+            <p>
+                <strong>Vertreten durch:</strong><br>
+                Daniel Schädlich
+            </p>
+            <p>
+                <strong>Kontakt:</strong><br>
+                E-Mail: climateguard@hackerban.de
+            </p>
+            <p>
+                <strong>Verantwortlich für den Inhalt:</strong><br>
+                Daniel Schädlich<br>
+                Thomas-Mann-Str. 37<br>
+                90513 Zirndorf
+            </p>
+        </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© <span id="year"></span> Nuernbergklima.de</p>
+    </div>
+  </footer>
+
+  <script>
+    // --- Footer Year ---
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+
+</body>
+</html>
