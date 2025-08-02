@@ -579,7 +579,7 @@ p {
       position: fixed;
       top: 0; /* Transform-Startpunkt ganz oben */
       right: 0; /* Ganz am rechten Rand */
-      transform: translate(1.25rem, -1.25rem) rotate(45deg);
+      transform: translate(1.25rem, 1.25rem) rotate(45deg);
       transform-origin: top right;
       background: linear-gradient(135deg, #06b6d4 0%, #14b8a6 100%);
       color: #ffffff;
@@ -603,7 +603,7 @@ p {
     }
     @media (max-width: 640px) {
       .notification-ribbon {
-        transform: translate(1rem, -1rem) rotate(45deg);
+        transform: translate(1rem, 1rem) rotate(45deg);
         padding: 0.25rem 1rem;
         font-size: 0.75rem;
       }
