@@ -569,38 +569,49 @@ p {
   margin-right: auto;
 }
 
-    /* Ribbon basiert auf dem primären Türkis-Ton aus dem Header-Button */
+    /* Header muss overflow-visible haben, um Ribbon anzuzeigen */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background-color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      overflow: visible;
+    }
+    .header .container {
+      position: relative; /* Parent für Ribbon */
+    }
     .notification-ribbon {
       position: absolute;
-      top: 1.25rem;
-      right: -1.5rem;
+      top: 1rem;
+      right: 1rem;
       background: linear-gradient(135deg, #06b6d4 0%, #14b8a6 100%);
       color: #ffffff;
       padding: 0.5rem 1.25rem;
+      font-family: 'Poppins', sans-serif;
       font-weight: 700;
-      font-size: 0.8125rem;
+      font-size: 0.875rem;
       letter-spacing: 0.05em;
       text-transform: uppercase;
       border-radius: 0.125rem;
       transform: rotate(45deg);
+      transform-origin: top right;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      font-family: inherit;
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
+      z-index: 1001;
+      white-space: nowrap;
     }
-    /* Globe-Icon per Emoji, alternativ eigenes SVG möglich */
+    /* Optional Icon */
     .notification-ribbon::before {
       content: "🌐";
-      font-size: 1rem;
+      margin-right: 0.25rem;
     }
     @media (max-width: 640px) {
       .notification-ribbon {
         top: 0.75rem;
-        right: -1rem;
+        right: 0.75rem;
         padding: 0.25rem 1rem;
-        font-size: 0.6875rem;
+        font-size: 0.75rem;
       }
       .notification-ribbon::before {
         font-size: 0.875rem;
