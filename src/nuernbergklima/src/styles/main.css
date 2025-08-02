@@ -571,51 +571,45 @@ p {
 
 html, body { margin: 0; padding: 0; }
 
-/* Wrapper verhindert Clipping: bleibt komplett im Viewport,
-   das eigentliche Band wird innen rotiert positioniert */
 .ribbon-corner {
   position: fixed;
   top: 0;
   right: 0;
-  width: 148px;        /* Fläche für die Diagonale */
-  height: 148px;
+  width: 180px;      /* Fläche für Diagonale; ggf. 200px setzen */
+  height: 180px;
   pointer-events: none; /* blockiert keine Klicks */
   z-index: 10000;
 }
 
 .ribbon-corner .notification-ribbon {
   position: absolute;
-  top: 16px;           /* vertikaler Versatz innerhalb des Wrappers */
-  right: -42px;        /* nach außen ziehen, ohne den Wrapper zu verlassen */
+  top: var(--ribbon-top);
+  right: var(--ribbon-right);
+  width: var(--ribbon-width);
   transform: rotate(45deg);
   transform-origin: center;
 
-  background: linear-gradient(135deg, #06b6d4 0%, #14b8a6 100%);
+  background: var(--ribbon-bg);
   color: #ffffff;
   padding: 8px 14px;
-  border-radius: 2px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0,0,0,.08);
 
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  font-size: 14px;
+  font: var(--ribbon-font);
   letter-spacing: .05em;
   text-transform: uppercase;
-  line-height: 1.15;
   text-align: center;
-  white-space: normal;  /* Zeilenumbruch erlauben */
-  width: 180px;         /* erzwingt 2 Zeilen */
+  white-space: normal;  /* erlaubt 2 Zeilen */
 }
 
 .notification-ribbon::before { content: ""; }
 
 @media (max-width: 640px) {
-  .ribbon-corner { width: 128px; height: 128px; }
-  .ribbon-corner .notification-ribbon {
-    top: 12px;
-    right: -36px;
-    width: 150px;
-    padding: 6px 12px;
-    font-size: 12px;
+  :root {
+    --ribbon-top: 22px;
+    --ribbon-right: -30px;
+    --ribbon-width: 150px;
+    --ribbon-font: 700 12px/1.15 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   }
+  .ribbon-corner { width: 150px; height: 150px; }
 }
