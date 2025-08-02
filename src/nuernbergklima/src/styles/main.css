@@ -568,3 +568,39 @@ p {
   margin-left: auto;
   margin-right: auto;
 }
+
+.notification-ribbon {
+  position: absolute;
+  top: 1rem;
+  right: -2rem;
+  background: linear-gradient(135deg, #4F46E5 0%, #3B82F6 100%);
+  color: #ffffff;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 0.25rem;
+  transform: rotate(45deg);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  font-family: inherit;
+  z-index: 1000;
+}
+.notification-ribbon::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  top: 0;
+  left: 0;
+  transform: rotate(-45deg);
+}
+@media (max-width: 640px) {
+  .notification-ribbon {
+    top: 0.5rem;
+    right: -1.5rem;
+    padding: 0.25rem 1.25rem;
+    font-size: 0.75rem;
+  }
+}
