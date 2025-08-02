@@ -572,12 +572,13 @@ p {
 html, body {
   margin: 0;
   padding: 0;
-  overflow-x: visible;
 }
 .notification-ribbon {
   position: fixed;
   top: 0;
   right: 0;
+  margin-top: -0.75rem;
+  margin-right: -1rem;
   background: linear-gradient(135deg, #06b6d4 0%, #14b8a6 100%);
   color: #ffffff;
   padding: 0.5rem 1.25rem;
@@ -587,7 +588,7 @@ html, body {
   letter-spacing: 0.05em;
   text-transform: uppercase;
   border-radius: 0.125rem;
-  transform: translate(50%, -50%) rotate(45deg);
+  transform: rotate(45deg);
   transform-origin: top right;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   z-index: 1001;
@@ -602,9 +603,10 @@ html, body {
 }
 @media (max-width: 640px) {
   .notification-ribbon {
+    margin-top: -0.5rem;
+    margin-right: -0.75rem;
     padding: 0.25rem 1rem;
     font-size: 0.75rem;
-    transform: translate(40%, -40%) rotate(45deg);
   }
   .notification-ribbon::before {
     font-size: 0.875rem;
