@@ -569,47 +569,60 @@ p {
   margin-right: auto;
 }
 
-html, body { margin: 0; padding: 0; }
+    /* ================= Corner Ribbon (bulletproof) =================
+       - Wrapper sitzt fix im Viewport (kein Clipping)
+       - Band ist zweizeilig und per CSS-Variablen feintunebar
+       - Keine negativen top-Margins, nur definierte Offsets
+    ================================================================= */
+    :root {
+      --ribbon-top: 30px;     /* vertikaler Versatz innerhalb der Ecke */
+      --ribbon-right: -35px;  /* nach rechts rausziehen (negativ) */
+      --ribbon-width: 180px;  /* Breite => 2 Zeilen bei langem Text */
+      --ribbon-font: 700 14px/1.15 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      --ribbon-bg: linear-gradient(135deg, #06b6d4 0%, #14b8a6 100%);
+    }
 
-.ribbon-corner {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 180px;      /* Fläche für Diagonale; ggf. 200px setzen */
-  height: 180px;
-  pointer-events: none; /* blockiert keine Klicks */
-  z-index: 10000;
-}
+    html, body { margin: 0; padding: 0; }
 
-.ribbon-corner .notification-ribbon {
-  position: absolute;
-  top: var(--ribbon-top);
-  right: var(--ribbon-right);
-  width: var(--ribbon-width);
-  transform: rotate(45deg);
-  transform-origin: center;
+    .ribbon-corner {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 180px;      /* Fläche für Diagonale; ggf. 200px setzen */
+      height: 180px;
+      pointer-events: none; /* blockiert keine Klicks */
+      z-index: 10000;
+    }
 
-  background: var(--ribbon-bg);
-  color: #ffffff;
-  padding: 8px 14px;
-  border-radius: 3px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0,0,0,.08);
+    .ribbon-corner .notification-ribbon {
+      position: absolute;
+      top: var(--ribbon-top);
+      right: var(--ribbon-right);
+      width: var(--ribbon-width);
+      transform: rotate(45deg);
+      transform-origin: center;
 
-  font: var(--ribbon-font);
-  letter-spacing: .05em;
-  text-transform: uppercase;
-  text-align: center;
-  white-space: normal;  /* erlaubt 2 Zeilen */
-}
+      background: var(--ribbon-bg);
+      color: #ffffff;
+      padding: 8px 14px;
+      border-radius: 3px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0,0,0,.08);
 
-.notification-ribbon::before { content: ""; }
+      font: var(--ribbon-font);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      text-align: center;
+      white-space: normal;  /* erlaubt 2 Zeilen */
+    }
 
-@media (max-width: 640px) {
-  :root {
-    --ribbon-top: 22px;
-    --ribbon-right: -30px;
-    --ribbon-width: 150px;
-    --ribbon-font: 700 12px/1.15 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  }
-  .ribbon-corner { width: 150px; height: 150px; }
-}
+    .notification-ribbon::before { content: ""; }
+
+    @media (max-width: 640px) {
+      :root {
+        --ribbon-top: 22px;
+        --ribbon-right: -30px;
+        --ribbon-width: 150px;
+        --ribbon-font: 700 12px/1.15 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      }
+      .ribbon-corner { width: 150px; height: 150px; }
+    }
