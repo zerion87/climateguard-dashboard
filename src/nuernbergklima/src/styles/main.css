@@ -569,6 +569,10 @@ p {
   margin-right: auto;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+}
 /* Corner-Ribbon – robust am Viewportrand ohne Clipping */
 .notification-ribbon {
   position: fixed;
