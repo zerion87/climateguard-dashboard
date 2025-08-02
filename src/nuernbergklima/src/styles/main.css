@@ -571,47 +571,51 @@ p {
 
 html, body { margin: 0; padding: 0; }
 
-.notification-ribbon {
+/* Wrapper verhindert Clipping: bleibt komplett im Viewport,
+   das eigentliche Band wird innen rotiert positioniert */
+.ribbon-corner {
   position: fixed;
   top: 0;
   right: 0;
-  /* leicht ins Eck gezogen – ohne Clipping nach oben */
-  margin-top: -0.75rem;
-  margin-right: -1rem;
+  width: 148px;        /* Fläche für die Diagonale */
+  height: 148px;
+  pointer-events: none; /* blockiert keine Klicks */
+  z-index: 10000;
+}
+
+.ribbon-corner .notification-ribbon {
+  position: absolute;
+  top: 16px;           /* vertikaler Versatz innerhalb des Wrappers */
+  right: -42px;        /* nach außen ziehen, ohne den Wrapper zu verlassen */
+  transform: rotate(45deg);
+  transform-origin: center;
+
   background: linear-gradient(135deg, #06b6d4 0%, #14b8a6 100%);
   color: #ffffff;
-  padding: 0.5rem 0.75rem;
+  padding: 8px 14px;
+  border-radius: 2px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
   font-family: 'Poppins', sans-serif;
   font-weight: 700;
-  font-size: 0.875rem;
-  letter-spacing: 0.05em;
+  font-size: 14px;
+  letter-spacing: .05em;
   text-transform: uppercase;
-  border-radius: 0.125rem;
-  transform: rotate(45deg);
-  transform-origin: top right;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1001;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
   line-height: 1.15;
-  width: 180px;          /* erzwingt den Zeilenumbruch */
-  white-space: normal;   /* mehrzeilig erlauben */
-  pointer-events: none;  /* überdeckt keine Klicks */
+  text-align: center;
+  white-space: normal;  /* Zeilenumbruch erlauben */
+  width: 180px;         /* erzwingt 2 Zeilen */
 }
-.notification-ribbon::before {
-  content: "🌐";
-  margin-right: 0.35rem;
-  font-size: 1rem;
-}
+
+.notification-ribbon::before { content: ""; }
+
 @media (max-width: 640px) {
-  .notification-ribbon {
+  .ribbon-corner { width: 128px; height: 128px; }
+  .ribbon-corner .notification-ribbon {
+    top: 12px;
+    right: -36px;
     width: 150px;
-    padding: 0.35rem 0.6rem;
-    font-size: 0.75rem;
-    margin-top: -0.5rem;
-    margin-right: -0.75rem;
+    padding: 6px 12px;
+    font-size: 12px;
   }
-  .notification-ribbon::before { font-size: 0.875rem; }
 }
