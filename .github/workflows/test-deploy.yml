@@ -2,21 +2,28 @@ name: Test Deployment
 
 on:
   push:
-    branches: [test]
+    branches: 
+      - 'test-*'  # Matches any branch starting with 'test-'
+      - 'feature/*' # Matches any branch in the feature/ namespace
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy (default: current branch)'
+        required: false
+        default: ${{ github.ref_name }}
 
 jobs:
   deploy:
     runs-on: quantum_server
     concurrency:
-      group: test-deployment
+      group: test-deployment-${{ github.ref_name }}
       cancel-in-progress: true
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          ref: test
+          ref: ${{ github.event.inputs.branch || github.ref_name }}
           
       - name: Stop and remove existing containers
         run: |
@@ -29,4 +36,5 @@ jobs:
       - name: Verify Deployment
         run: |
           echo "Test environment deployed successfully!"
+          echo "Branch: ${{ github.ref_name }}"
           echo "Access at: http://your-server-ip:8061"
