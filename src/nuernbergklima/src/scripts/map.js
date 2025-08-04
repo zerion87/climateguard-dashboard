@@ -7,22 +7,163 @@ document.addEventListener("DOMContentLoaded", function () {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Marker-Cluster und Heatmap-Layer
+    // Marker-Cluster und Custom Heatmap-Layer
     const markers = L.markerClusterGroup();
-    const heatmapLayer = L.heatLayer([], {
-        radius: 25,
-        blur: 5,
-        maxZoom: 10,
-        gradient: {
-            0.0: "blue",
-            0.2: "cyan",
-            0.4: "lime",
-            0.6: "yellow",
-            0.8: "orange",
-            1.0: "red"
-        }
-    }).addTo(map);
     map.addLayer(markers);
+    
+    // Custom Heatmap Canvas Layer
+    const CustomHeatmapLayer = L.Layer.extend({
+        initialize: function(options) {
+            L.setOptions(this, options);
+            this._data = [];
+            this._canvas = null;
+            this._ctx = null;
+        },
+        
+        onAdd: function(map) {
+            this._map = map;
+            this._canvas = L.DomUtil.create('canvas', 'custom-heatmap-layer');
+            this._ctx = this._canvas.getContext('2d');
+            
+            // Canvas styling
+            this._canvas.style.position = 'absolute';
+            this._canvas.style.top = '0';
+            this._canvas.style.left = '0';
+            this._canvas.style.pointerEvents = 'none';
+            this._canvas.style.zIndex = '200';
+            
+            map.getPanes().overlayPane.appendChild(this._canvas);
+            
+            // Event listeners
+            map.on('viewreset', this._reset, this);
+            map.on('zoom', this._reset, this);
+            map.on('move', this._reset, this);
+            
+            this._reset();
+        },
+        
+        onRemove: function(map) {
+            map.getPanes().overlayPane.removeChild(this._canvas);
+            map.off('viewreset', this._reset, this);
+            map.off('zoom', this._reset, this);
+            map.off('move', this._reset, this);
+        },
+        
+        setData: function(data) {
+            this._data = data;
+            this._redraw();
+        },
+        
+        _reset: function() {
+            const size = this._map.getSize();
+            const bounds = this._map.getBounds();
+            const topLeft = this._map.latLngToLayerPoint(bounds.getNorthWest());
+            
+            L.DomUtil.setPosition(this._canvas, topLeft);
+            this._canvas.width = size.x;
+            this._canvas.height = size.y;
+            
+            this._redraw();
+        },
+        
+        _redraw: function() {
+            if (!this._canvas || !this._ctx || this._data.length === 0) return;
+            
+            const ctx = this._ctx;
+            const canvas = this._canvas;
+            const zoom = this._map.getZoom();
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Calculate radius based on zoom level
+            const baseRadius = Math.max(10, 50 - zoom * 2);
+            
+            // Create temperature grid to prevent additive effects
+            const gridSize = Math.max(5, baseRadius / 3);
+            const grid = new Map();
+            
+            // Map each data point to grid cells and store max temperature per cell
+            this._data.forEach(point => {
+                const [lat, lng, temp] = point;
+                const pixelPoint = this._map.latLngToContainerPoint([lat, lng]);
+                
+                if (pixelPoint.x >= 0 && pixelPoint.x <= canvas.width && 
+                    pixelPoint.y >= 0 && pixelPoint.y <= canvas.height) {
+                    
+                    const gridX = Math.floor(pixelPoint.x / gridSize);
+                    const gridY = Math.floor(pixelPoint.y / gridSize);
+                    const gridKey = `${gridX},${gridY}`;
+                    
+                    // Use maximum temperature in each grid cell (prevents addition)
+                    if (!grid.has(gridKey) || grid.get(gridKey).temp < temp) {
+                        grid.set(gridKey, {
+                            x: pixelPoint.x,
+                            y: pixelPoint.y,
+                            temp: temp
+                        });
+                    }
+                }
+            });
+            
+            // Draw heatmap points
+            grid.forEach(point => {
+                const color = this._getColorForTemperature(point.temp);
+                const gradient = ctx.createRadialGradient(
+                    point.x, point.y, 0,
+                    point.x, point.y, baseRadius
+                );
+                
+                gradient.addColorStop(0, color.replace('rgb', 'rgba').replace(')', ', 0.8)'));
+                gradient.addColorStop(0.5, color.replace('rgb', 'rgba').replace(')', ', 0.4)'));
+                gradient.addColorStop(1, color.replace('rgb', 'rgba').replace(')', ', 0)'));
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, baseRadius, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+        },
+        
+        _getColorForTemperature: function(temp) {
+            // Normalize temperature (assuming -10°C to 40°C range)
+            const normalized = Math.max(0, Math.min(1, (temp + 10) / 50));
+            
+            // Color gradient stops
+            const colors = [
+                { pos: 0.0, r: 0, g: 0, b: 255 },     // blue
+                { pos: 0.2, r: 0, g: 255, b: 255 },   // cyan
+                { pos: 0.4, r: 0, g: 255, b: 0 },     // lime
+                { pos: 0.6, r: 255, g: 255, b: 0 },   // yellow
+                { pos: 0.8, r: 255, g: 165, b: 0 },   // orange
+                { pos: 1.0, r: 255, g: 0, b: 0 }      // red
+            ];
+            
+            // Find the two colors to interpolate between
+            let color1 = colors[0];
+            let color2 = colors[colors.length - 1];
+            
+            for (let i = 0; i < colors.length - 1; i++) {
+                if (normalized >= colors[i].pos && normalized <= colors[i + 1].pos) {
+                    color1 = colors[i];
+                    color2 = colors[i + 1];
+                    break;
+                }
+            }
+            
+            // Interpolate
+            const ratio = (normalized - color1.pos) / (color2.pos - color1.pos);
+            const r = Math.round(color1.r + (color2.r - color1.r) * ratio);
+            const g = Math.round(color1.g + (color2.g - color1.g) * ratio);
+            const b = Math.round(color1.b + (color2.b - color1.b) * ratio);
+            
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+    });
+    
+    // Create custom heatmap layer instance
+    const customHeatmapLayer = new CustomHeatmapLayer();
+    map.addLayer(customHeatmapLayer);
 
     // Datenstrukturen
     let sensorData = {};   // { sensorId: [ { timestamp, temperature }, … ] }
@@ -323,7 +464,9 @@ const maxDateIso  = encodeURIComponent(endLocal.toISOString());   // z.B. "2025-
         timeDisplay.innerText = formatBerlinTime(selTs);
 
         markers.clearLayers();
-        heatmapLayer.setLatLngs([]);
+        
+        // Collect temperature data for custom heatmap
+        const heatmapData = [];
 
         Object.keys(sensorData).forEach(sensorId => {
             const readings = sensorData[sensorId];
@@ -338,8 +481,13 @@ const maxDateIso  = encodeURIComponent(endLocal.toISOString());   // z.B. "2025-
             if (!meta) return;  
 
             addClusteredMarker(meta.lat, meta.lon, sel.temperature, meta.name, trend, sel.timestamp);
-            heatmapLayer.addLatLng([meta.lat, meta.lon, normalizeTemperature(sel.temperature)]);
+            
+            // Add to custom heatmap data (lat, lng, actual temperature)
+            heatmapData.push([meta.lat, meta.lon, sel.temperature]);
         });
+        
+        // Update custom heatmap with new data
+        customHeatmapLayer.setData(heatmapData);
 
 // Beim ersten Laden Bounds auf die sichtbaren Marker setzen
 if (firstLoad) {
