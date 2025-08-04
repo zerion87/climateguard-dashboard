@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             // Calculate radius based on zoom level (balanced size)
-            const baseRadius = Math.max(13, 60 - zoom * 2);
+            const baseRadius = 25;
             
             // Create temperature grid to prevent additive effects
             const gridSize = Math.max(5, baseRadius / 3);
@@ -127,33 +127,33 @@ document.addEventListener("DOMContentLoaded", function () {
         },
         
         _getColorForTemperature: function(temp) {
-            // Normalize temperature (assuming -10°C to 40°C range)
-            const normalized = Math.max(0, Math.min(1, (temp + 10) / 50));
+            // Normalize temperature to 0-1 range (assuming -10°C to 40°C)
+            const normalizedTemp = Math.max(0, Math.min(1, (temp + 10) / 50));
             
-            // Color gradient stops (balanced intensity)
-            const colors = [
-                { pos: 0.0, r: 30, g: 80, b: 255 },     // balanced blue
-                { pos: 0.2, r: 0, g: 200, b: 255 },     // balanced cyan
-                { pos: 0.4, r: 80, g: 255, b: 80 },     // balanced lime
-                { pos: 0.6, r: 255, g: 220, b: 0 },     // balanced yellow
-                { pos: 0.8, r: 255, g: 160, b: 0 },     // balanced orange
-                { pos: 1.0, r: 255, g: 80, b: 80 }      // balanced red
+            // Define color stops matching original Leaflet.heat gradient
+            const colorStops = [
+                { pos: 0.0, r: 0, g: 0, b: 255 },     // Blue
+                { pos: 0.2, r: 0, g: 255, b: 255 },   // Cyan
+                { pos: 0.4, r: 0, g: 255, b: 0 },     // Lime
+                { pos: 0.6, r: 255, g: 255, b: 0 },   // Yellow
+                { pos: 0.8, r: 255, g: 165, b: 0 },   // Orange
+                { pos: 1.0, r: 255, g: 0, b: 0 }      // Red
             ];
             
             // Find the two colors to interpolate between
-            let color1 = colors[0];
-            let color2 = colors[colors.length - 1];
+            let color1 = colorStops[0];
+            let color2 = colorStops[colorStops.length - 1];
             
-            for (let i = 0; i < colors.length - 1; i++) {
-                if (normalized >= colors[i].pos && normalized <= colors[i + 1].pos) {
-                    color1 = colors[i];
-                    color2 = colors[i + 1];
+            for (let i = 0; i < colorStops.length - 1; i++) {
+                if (normalizedTemp >= colorStops[i].pos && normalizedTemp <= colorStops[i + 1].pos) {
+                    color1 = colorStops[i];
+                    color2 = colorStops[i + 1];
                     break;
                 }
             }
             
             // Interpolate
-            const ratio = (normalized - color1.pos) / (color2.pos - color1.pos);
+            const ratio = (normalizedTemp - color1.pos) / (color2.pos - color1.pos);
             const r = Math.round(color1.r + (color2.r - color1.r) * ratio);
             const g = Math.round(color1.g + (color2.g - color1.g) * ratio);
             const b = Math.round(color1.b + (color2.b - color1.b) * ratio);
