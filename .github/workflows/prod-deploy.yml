@@ -1,0 +1,30 @@
+name: Production Deployment
+
+on:
+  workflow_dispatch:  # Manual trigger only
+
+jobs:
+  deploy:
+    runs-on: quantum_server
+    concurrency:
+      group: prod-deployment
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: main  # Always deploy from main branch
+          
+      - name: Stop and remove existing containers
+        run: |
+          docker compose -f docker-compose.prod.yml down || true
+          
+      - name: Deploy Production Environment
+        run: |
+          docker compose -f docker-compose.prod.yml up -d --build
+          
+      - name: Verify Deployment
+        run: |
+          echo "Production environment deployed successfully!"
+          echo "Access at: http://your-server-ip:8060"

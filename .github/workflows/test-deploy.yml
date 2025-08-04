@@ -1,0 +1,32 @@
+name: Test Deployment
+
+on:
+  push:
+    branches: [test]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: quantum_server
+    concurrency:
+      group: test-deployment
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: test
+          
+      - name: Stop and remove existing containers
+        run: |
+          docker compose -f docker-compose.test.yml down || true
+          
+      - name: Deploy Test Environment
+        run: |
+          docker compose -f docker-compose.test.yml up -d --build
+          
+      - name: Verify Deployment
+        run: |
+          echo "Test environment deployed successfully!"
+          echo "Access at: http://your-server-ip:8061"

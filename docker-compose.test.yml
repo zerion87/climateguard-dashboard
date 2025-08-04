@@ -1,0 +1,12 @@
+services:
+  nuernbergklima:
+    build:
+      context: ./src/nuernbergklima
+      dockerfile: Dockerfile
+    container_name: nuernbergklima-test
+    restart: always
+    ports:
+      - "8061:80"
+      - "9444:443"
+    environment:
+      - NODE_ENV=test

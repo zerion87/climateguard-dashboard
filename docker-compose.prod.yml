@@ -1,0 +1,12 @@
+services:
+  nuernbergklima:
+    build:
+      context: ./src/nuernbergklima
+      dockerfile: Dockerfile
+    container_name: nuernbergklima-prod
+    restart: always
+    ports:
+      - "8060:80"
+      - "9443:443"
+    environment:
+      - NODE_ENV=production
