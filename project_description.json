@@ -1,0 +1,83 @@
+{
+  "project": {
+    "name": "NuernbergKlima.de",
+    "description": "A citizen portal focused on urban climate improvement in Nuremberg, Germany",
+    "purpose": "To engage citizens in improving urban climate conditions through interactive mapping and information sharing",
+    "language": "German",
+    "type": "Web Application"
+  },
+  "technical_structure": {
+    "framework": "HTML5/CSS3/JavaScript",
+    "main_components": [
+      {
+        "name": "Frontend",
+        "location": "src/nuernbergklima/src",
+        "subcomponents": [
+          {
+            "name": "Leaflet Integration",
+            "description": "Interactive mapping interface using Leaflet.js",
+            "location": "src/nuernbergklima/src/leaflet"
+          },
+          {
+            "name": "Assets",
+            "description": "Images, fonts, and styles",
+            "location": {
+              "fonts": "src/nuernbergklima/src/fonts",
+              "images": "src/nuernbergklima/src/img",
+              "styles": "src/nuernbergklima/src/styles"
+            }
+          },
+          {
+            "name": "Scripts",
+            "description": "Application logic and map interactions",
+            "location": "src/nuernbergklima/src/scripts"
+          }
+        ]
+      },
+      {
+        "name": "Containerization",
+        "description": "Docker setup for deployment",
+        "location": "src/nuernbergklima",
+        "files": [
+          "Dockerfile",
+          "docker-compose.yml"
+        ]
+      }
+    ]
+  },
+  "features": {
+    "main_sections": [
+      {
+        "name": "Map Section",
+        "description": "Interactive map interface for visualizing climate data"
+      },
+      {
+        "name": "About Section",
+        "description": "Project information and goals"
+      },
+      {
+        "name": "Contact Section",
+        "description": "Impressum and contact information"
+      }
+    ],
+    "technical_features": [
+      "Responsive design",
+      "Mobile-friendly navigation",
+      "Interactive mapping with Leaflet",
+      "Heatmap visualization",
+      "Marker clustering"
+    ]
+  },
+  "metadata": {
+    "funding": {
+      "source": "German National Urban Development Policy",
+      "ministry": "Bundesministerium für Wohnen, Stadtenwicklung und Bauwesen (BMWSB)",
+      "program": "Was wäre, wenn...?"
+    },
+    "repository": {
+      "type": "GitHub",
+      "organization": "hackerbande-nbg",
+      "name": "climateguard-dashboard"
+    }
+  }
+}
