@@ -76,8 +76,8 @@ document.addEventListener("DOMContentLoaded", function () {
             // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Calculate radius based on zoom level
-            const baseRadius = Math.max(10, 50 - zoom * 2);
+            // Calculate radius based on zoom level (increased size)
+            const baseRadius = Math.max(15, 70 - zoom * 2);
             
             // Create temperature grid to prevent additive effects
             const gridSize = Math.max(5, baseRadius / 3);
@@ -114,8 +114,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     point.x, point.y, baseRadius
                 );
                 
-                gradient.addColorStop(0, color.replace('rgb', 'rgba').replace(')', ', 0.8)'));
-                gradient.addColorStop(0.5, color.replace('rgb', 'rgba').replace(')', ', 0.4)'));
+                gradient.addColorStop(0, color.replace('rgb', 'rgba').replace(')', ', 1.0)'));
+                gradient.addColorStop(0.3, color.replace('rgb', 'rgba').replace(')', ', 0.8)'));
+                gradient.addColorStop(0.7, color.replace('rgb', 'rgba').replace(')', ', 0.5)'));
                 gradient.addColorStop(1, color.replace('rgb', 'rgba').replace(')', ', 0)'));
                 
                 ctx.fillStyle = gradient;
@@ -129,14 +130,14 @@ document.addEventListener("DOMContentLoaded", function () {
             // Normalize temperature (assuming -10°C to 40°C range)
             const normalized = Math.max(0, Math.min(1, (temp + 10) / 50));
             
-            // Color gradient stops
+            // Color gradient stops (more intense colors)
             const colors = [
-                { pos: 0.0, r: 0, g: 0, b: 255 },     // blue
-                { pos: 0.2, r: 0, g: 255, b: 255 },   // cyan
-                { pos: 0.4, r: 0, g: 255, b: 0 },     // lime
-                { pos: 0.6, r: 255, g: 255, b: 0 },   // yellow
-                { pos: 0.8, r: 255, g: 165, b: 0 },   // orange
-                { pos: 1.0, r: 255, g: 0, b: 0 }      // red
+                { pos: 0.0, r: 0, g: 100, b: 255 },     // intense blue
+                { pos: 0.2, r: 0, g: 255, b: 255 },     // bright cyan
+                { pos: 0.4, r: 50, g: 255, b: 50 },     // bright lime
+                { pos: 0.6, r: 255, g: 255, b: 0 },     // bright yellow
+                { pos: 0.8, r: 255, g: 140, b: 0 },     // intense orange
+                { pos: 1.0, r: 255, g: 50, b: 50 }      // intense red
             ];
             
             // Find the two colors to interpolate between
