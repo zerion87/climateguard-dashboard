@@ -1,5 +1,5 @@
 services:
-  nuernbergklima:
+  nuernbergklima-test:
     build:
       context: .
       dockerfile: src/nuernbergklima/Dockerfile
