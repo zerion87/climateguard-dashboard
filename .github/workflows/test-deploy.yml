@@ -2,8 +2,14 @@ name: Test Deployment
 
 on:
   push:
-    branches: [test]
+    branches: 
+      - 'test-*'  # Matches any branch starting with 'test-'
+      - 'feature/*' # Matches any branch in the feature/ namespace
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy (leave empty to use the current branch)'
+        required: false
 
 jobs:
   deploy:
@@ -15,8 +21,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          ref: test
           
       - name: Stop and remove existing containers
         run: |
@@ -29,4 +33,5 @@ jobs:
       - name: Verify Deployment
         run: |
           echo "Test environment deployed successfully!"
+          echo "Branch: ${{ github.ref_name }}"
           echo "Access at: http://your-server-ip:8061"
