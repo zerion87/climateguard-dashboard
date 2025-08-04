@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             // Calculate radius based on zoom level (balanced size)
-            const baseRadius = Math.max(12, 55 - zoom * 2);
+            const baseRadius = Math.max(13, 60 - zoom * 2);
             
             // Create temperature grid to prevent additive effects
             const gridSize = Math.max(5, baseRadius / 3);
@@ -114,9 +114,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     point.x, point.y, baseRadius
                 );
                 
-                gradient.addColorStop(0, color.replace('rgb', 'rgba').replace(')', ', 0.75)'));
-                gradient.addColorStop(0.4, color.replace('rgb', 'rgba').replace(')', ', 0.5)'));
-                gradient.addColorStop(0.8, color.replace('rgb', 'rgba').replace(')', ', 0.2)'));
+                gradient.addColorStop(0, color.replace('rgb', 'rgba').replace(')', ', 1.0)'));
+                gradient.addColorStop(0.4, color.replace('rgb', 'rgba').replace(')', ', 0.7)'));
+                gradient.addColorStop(0.8, color.replace('rgb', 'rgba').replace(')', ', 0.4)'));
                 gradient.addColorStop(1, color.replace('rgb', 'rgba').replace(')', ', 0)'));
                 
                 ctx.fillStyle = gradient;
