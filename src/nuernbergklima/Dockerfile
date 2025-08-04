@@ -4,8 +4,8 @@ FROM nginx:alpine
 # Entferne Standard-Nginx-Inhalte
 RUN rm -rf /usr/share/nginx/html/*
 
-# Kopiere die Website aus dem Projektverzeichnis in das HTML-Verzeichnis von Nginx
-COPY . /usr/share/nginx/html
+# Kopiere die Website-Dateien in das HTML-Verzeichnis von Nginx
+COPY src/ /usr/share/nginx/html/
 
 # Setze sichere Datei- und Verzeichnisrechte
 RUN chmod -R 755 /usr/share/nginx/html && \

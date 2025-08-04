@@ -1,8 +1,8 @@
 services:
   nuernbergklima:
     build:
-      context: ./src/nuernbergklima
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: src/nuernbergklima/Dockerfile
     container_name: nuernbergklima-prod
     restart: always
     ports:
