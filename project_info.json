@@ -1,0 +1,44 @@
+{
+  "projectName": "NuernbergKlima.de",
+  "description": "A citizen portal to collect and visualize real-time climate data from Nuremberg, focusing on heat distribution within the city.",
+  "goal": "To make heat differences in a city quarter visible to everyone, raise awareness, and help find solutions for a more climate-friendly neighborhood.",
+  "technologyStack": {
+    "frontend": {
+      "languages": ["HTML", "CSS", "JavaScript"],
+      "libraries": [
+        "Leaflet.js",
+        "leaflet.markercluster",
+        "leaflet-heat"
+      ]
+    },
+    "webServer": "Nginx",
+    "containerization": "Docker"
+  },
+  "dataSource": {
+    "apiUrl": "https://api.quantum.hackerban.de/v2/",
+    "endpoints": [
+      "/devices",
+      "/metrics"
+    ],
+    "description": "The application fetches sensor metadata and temperature readings from an external API."
+  },
+  "keyFeatures": [
+    "Interactive map showing sensor locations.",
+    "Clustered markers for sensors.",
+    "Heatmap layer to visualize temperature distribution.",
+    "Time slider to view historical data for the current day.",
+    "Statistics cards showing highest and lowest temperature, number of active sensors, and largest temperature difference."
+  ],
+  "organization": {
+    "name": "Hackerbande Nürnberg",
+    "contact": "climateguard@hackerban.de"
+  },
+  "funding": {
+    "organization": "Nationale Stadtentwicklungspolitik",
+    "ministry": "Bundesministerium für Wohnen, Stadtentwicklung und Bauwesen (BMWSB)"
+  },
+  "deployment": {
+    "method": "Docker container",
+    "configuration": "docker-compose.yml"
+  }
+}
