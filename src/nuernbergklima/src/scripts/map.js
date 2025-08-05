@@ -119,10 +119,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 gradient.addColorStop(0.8, color.replace('rgb', 'rgba').replace(')', ', 0.4)'));
                 gradient.addColorStop(1, color.replace('rgb', 'rgba').replace(')', ', 0)'));
                 
+                // Draw filled circle
                 ctx.fillStyle = gradient;
                 ctx.beginPath();
                 ctx.arc(point.x, point.y, baseRadius, 0, 2 * Math.PI);
                 ctx.fill();
+                
+                // Draw light blue border
+                ctx.strokeStyle = 'rgba(173, 216, 230, 0.6)'; // Light blue with transparency
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, baseRadius, 0, 2 * Math.PI);
+                ctx.stroke();
             });
         },
         
