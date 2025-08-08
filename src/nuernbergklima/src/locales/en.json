@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "title": "NuernbergKlima – Citizen Portal",
+    "description": "NuernbergKlima.de – Together for a better urban climate"
+  },
+  "common": {
+    "logo_alt": "NuernbergKlima Logo"
+  },
+  "nav": {
+    "map": "Map",
+    "about": "About",
+    "contact": "Contact",
+    "imprint": "Imprint",
+    "menu": "Open menu"
+  },
+  "hero": {
+    "title": "Together for a better urban climate",
+    "subtitle": "NuernbergKlima.de collects and visualizes real-time climate data from Nuremberg. See where it’s particularly hot and where cooler spots can be found!"
+  },
+  "stats": {
+    "max_today": "highest temperature today",
+    "sensors_active": "sensors active",
+    "max_diff_today": "largest temperature difference today",
+    "min_today": "lowest temperature today"
+  },
+  "about": {
+    "title_prefix": "What is",
+    "title_suffix": "?",
+    "lead": "Together we show in real time how heat is distributed differently in Nuremberg’s Südstadt – open, understandable, and accessible to all.",
+    "features": {
+      "what": {
+        "title": "What is NuernbergKlima.de?",
+        "text": "With this project, we want to find out together how warm (or cold) it is at different places in the Südstadt."
+      },
+      "why": {
+        "title": "Why are we doing this?",
+        "text": "Extreme heat affects more and more cities. Temperatures can vary significantly even within a single neighborhood, depending on factors like the amount of greenery or the density of buildings. Our sensors therefore measure temperatures at various locations. The data is collected anonymously and visualized on our map in real time."
+      },
+      "data": {
+        "title": "What happens to the data?",
+        "text": "All measurements are publicly accessible. This way, everyone can see where it gets particularly hot and where it stays cooler. We want to make visible which parts of our neighborhood struggle most with heat—and help find solutions together to make our community more climate-friendly."
+      },
+      "who": {
+        "title": "Who is behind this?",
+        "text": "The project is an initiative by Hackerbande Nürnberg consisting of people like you. We appreciate any support or feedback!"
+      }
+    },
+    "note": "All data is anonymized and freely usable. Suggestions & ideas are welcome."
+  },
+  "sponsors": {
+    "title": "The project is funded within the framework of ‘What if...?’ by the National Urban Development Policy through the Federal Ministry for Housing, Urban Development and Building (BMWSB)."
+  },
+  "imprint": {
+    "title": "Imprint",
+    "represented_by": "Represented by:",
+    "contact": "Contact:",
+    "responsible": "Responsible for the content:"
+  }
+}
