@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="de" class="scroll-smooth">
 <head>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Das Temperatur-Projekt in der Nürnberger Südstadt. Entdecke Live-Klimadaten aus deinem Viertel.">
@@ -10,6 +11,7 @@
   <link rel="icon" href="../img/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="icon" href="../img/favicon-16.png" sizes="16x16" type="image/png">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
+  <script src="../scripts/i18n.js" defer></script>
   <style>
     /* --- Base & Variables --- */
     :root {
@@ -220,12 +222,16 @@
     }
   </style>
 </head>
-<body>
+<body data-i18n-meta-title-key="pages.wasistdas.meta.title" data-i18n-meta-description-key="pages.wasistdas.meta.description">
 
   <header class="site-header">
     <div class="container">
         <div class="logo-container">
-            <img src="../img/logo_transparent.png" alt="Logo des Projekts">
+            <img src="../img/logo_transparent.png" alt="Logo des Projekts" data-i18n="common.logo_alt" data-i18n-attr="alt">
+            <select id="lang-select" aria-label="Language selector" style="margin-left:1rem;">
+              <option value="de">DE</option>
+              <option value="en">EN</option>
+            </select>
         </div>
     </div>
   </header>
@@ -236,46 +242,44 @@
         
         <img src="./schutzgehaeuse.png" alt="Temperatursensor in einem Strahlungsschutzgehäuse" class="sensor-image">
 
-        <h1><span class="gradient-text">Was ist das?</span></h1>
+        <h1><span class="gradient-text" data-i18n="wasistdas.title">Was ist das?</span></h1>
         <p style="text-align: center; font-size: 1.25rem; color: var(--text-dark);">
-            Willkommen beim Temperatur-Projekt in der Nürnberger Südstadt!<br>
-            Du hast einen unserer Temperatur-Sensoren entdeckt – toll, dass Du neugierig bist!
+            <span data-i18n="wasistdas.intro.line1">Willkommen beim Temperatur-Projekt in der Nürnberger Südstadt!</span><br>
+            <span data-i18n="wasistdas.intro.line2">Du hast einen unserer Temperatur-Sensoren entdeckt – toll, dass Du neugierig bist!</span>
         </p>
 
-        <p>
+        <p data-i18n="wasistdas.what.text">
             Mit diesem Projekt möchten wir gemeinsam herausfinden, wie warm (oder kalt) es an verschiedenen Orten in der Südstadt ist.
         </p>
         
-        <h2>Wieso machen wir das?</h2>
-        <p>
+        <h2 data-i18n="wasistdas.why.title">Wieso machen wir das?</h2>
+        <p data-i18n="wasistdas.why.text">
             Extreme Hitze betrifft immer mehr Städte. Die Temperatur kann aber sogar innerhalb eines Viertels ganz unterschiedlich sein, z.B. je nachdem, wie viel Grün es gibt oder wie eng die Bebauung ist. Unsere Sensoren messen daher die Temperatur an verschiedenen Standorten. Die Daten werden anonym erfasst und auf unserer Karte in Echtzeit visualisiert.
         </p>
         
-        <h2>Was passiert mit den Daten?</h2>
-        <p>
+        <h2 data-i18n="wasistdas.data.title">Was passiert mit den Daten?</h2>
+        <p data-i18n="wasistdas.data.text">
             Alle Messwerte sind öffentlich einsehbar. So können alle sehen, wo es besonders heiß wird und wo es kühler bleibt. Damit wollen wir sichtbar machen, welche Ecken unseres Viertels besonders mit Hitze zu kämpfen haben – und dabei helfen, gemeinsam Lösungen zu finden, um unsere Nachbarschaft klimafreundlicher zu gestalten.
         </p>
         
-        <h2>Wer macht das?</h2>
-        <p>
+        <h2 data-i18n="wasistdas.who.title">Wer macht das?</h2>
+        <p data-i18n="wasistdas.who.text">
             Das Projekt ist eine Initiative von Hackerbande Nürnberg bestehend aus Leuten wie dir. Wir freuen uns über Unterstützung oder Feedback!
         </p>
 
-        <h2>Auf gehts!</h2>
-        <p style="text-align: center;">
+        <h2 data-i18n="wasistdas.go.title">Auf gehts!</h2>
+        <p style="text-align: center;" data-i18n="wasistdas.go.text">
             Jetzt schau dich um und erfahre mehr über die Temperaturen in deinem Viertel!
         </p>
 
-        <a href="https://nuernbergklima.de" class="cta-button">Zur Karte!</a>
+        <a href="https://nuernbergklima.de" class="cta-button" data-i18n="wasistdas.cta">Zur Karte!</a>
         
       </div>
     </section>
 
-
-
     <section class="sponsors-section">
       <div class="container">
-          <h2>Das Projekt wird im Rahmen von „Was wäre,  wenn...?“ von der Nationalen Stadtentwicklungspolitik durch das Bundesministerium für Wohnen, Stadtentwicklung und Bauwesen (BMWSB) gefördert.</h2>
+          <h2 data-i18n="sponsors.title">Das Projekt wird im Rahmen von „Was wäre,  wenn...?“ von der Nationalen Stadtentwicklungspolitik durch das Bundesministerium für Wohnen, Stadtentwicklung und Bauwesen (BMWSB) gefördert.</h2>
           <div class="logo-grid">
               <a href="https://www.waswaerewenn2035.de/" target="_blank" rel="noopener noreferrer">
                   <img src="../img/UL_WWW_Wortmarke_Schwarz+Slogan.png" alt="Waswarewenn2035">
@@ -295,7 +299,7 @@
 
     <section class="impressum-section">
         <div class="container">
-            <h2>Impressum</h2>
+            <h2 data-i18n="imprint.title">Impressum</h2>
             
             <p>
                 Koitka, Mirring, Schädlich GbR<br>
@@ -303,15 +307,15 @@
                 90402 Nürnberg<br>
             </p>
             <p>
-                <strong>Vertreten durch:</strong><br>
+                <strong data-i18n="imprint.represented_by">Vertreten durch:</strong><br>
                 Daniel Schädlich
             </p>
             <p>
-                <strong>Kontakt:</strong><br>
+                <strong data-i18n="imprint.contact">Kontakt:</strong><br>
                 E-Mail: climateguard@hackerban.de
             </p>
             <p>
-                <strong>Verantwortlich für den Inhalt:</strong><br>
+                <strong data-i18n="imprint.responsible">Verantwortlich für den Inhalt:</strong><br>
                 Daniel Schädlich<br>
                 Thomas-Mann-Str. 37<br>
                 90513 Zirndorf

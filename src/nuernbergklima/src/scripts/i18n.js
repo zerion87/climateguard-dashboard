@@ -19,21 +19,40 @@
   }
 
   function applyTranslations(dict) {
+    // Helper to resolve dotted key from object
+    const resolve = (obj, path) => path
+      .split('.')
+      .reduce((acc, k) => (acc && acc[k] != null) ? acc[k] : undefined, obj);
+
+    // Page-specific meta keys (optional)
+    const body = document.body;
+    const metaTitleKey = body.getAttribute('data-i18n-meta-title-key');
+    const metaDescKey = body.getAttribute('data-i18n-meta-description-key');
+
+    const pageTitle = metaTitleKey ? resolve(dict, metaTitleKey) : undefined;
+    const pageDesc = metaDescKey ? resolve(dict, metaDescKey) : undefined;
+
     // Update <title>
-    if (dict.meta && dict.meta.title) {
+    if (pageTitle != null) {
+      document.title = pageTitle;
+    } else if (dict.meta && dict.meta.title) {
       document.title = dict.meta.title;
     }
     // Update <meta name="description">
-    if (dict.meta && dict.meta.description) {
-      const metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc) metaDesc.setAttribute('content', dict.meta.description);
+    const metaDescEl = document.querySelector('meta[name="description"]');
+    if (metaDescEl) {
+      if (pageDesc != null) {
+        metaDescEl.setAttribute('content', pageDesc);
+      } else if (dict.meta && dict.meta.description) {
+        metaDescEl.setAttribute('content', dict.meta.description);
+      }
     }
 
     // data-i18n handling
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
       const attr = el.getAttribute('data-i18n-attr'); // e.g. 'placeholder', 'alt', 'title'
-      const value = key.split('.').reduce((acc, k) => (acc && acc[k] != null) ? acc[k] : undefined, dict);
+      const value = resolve(dict, key);
       if (value == null) return;
       if (attr) {
         el.setAttribute(attr, value);

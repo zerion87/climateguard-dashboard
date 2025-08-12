@@ -55,5 +55,40 @@
     "represented_by": "Vertreten durch:",
     "contact": "Kontakt:",
     "responsible": "Verantwortlich für den Inhalt:"
+  },
+  "pages": {
+    "wasistdas": {
+      "meta": {
+        "title": "NuernbergKlima – Was ist das?",
+        "description": "Das Temperatur-Projekt in der Nürnberger Südstadt. Entdecke Live-Klimadaten aus deinem Viertel."
+      }
+    }
+  },
+  "wasistdas": {
+    "title": "Was ist das?",
+    "intro": {
+      "line1": "Willkommen beim Temperatur-Projekt in der Nürnberger Südstadt!",
+      "line2": "Du hast einen unserer Temperatur-Sensoren entdeckt – toll, dass Du neugierig bist!"
+    },
+    "what": {
+      "text": "Mit diesem Projekt möchten wir gemeinsam herausfinden, wie warm (oder kalt) es an verschiedenen Orten in der Südstadt ist."
+    },
+    "why": {
+      "title": "Wieso machen wir das?",
+      "text": "Extreme Hitze betrifft immer mehr Städte. Die Temperatur kann aber sogar innerhalb eines Viertels ganz unterschiedlich sein, z.B. je nachdem, wie viel Grün es gibt oder wie eng die Bebauung ist. Unsere Sensoren messen daher die Temperatur an verschiedenen Standorten. Die Daten werden anonym erfasst und auf unserer Karte in Echtzeit visualisiert."
+    },
+    "data": {
+      "title": "Was passiert mit den Daten?",
+      "text": "Alle Messwerte sind öffentlich einsehbar. So können alle sehen, wo es besonders heiß wird und wo es kühler bleibt. Damit wollen wir sichtbar machen, welche Ecken unseres Viertels besonders mit Hitze zu kämpfen haben – und dabei helfen, gemeinsam Lösungen zu finden, um unsere Nachbarschaft klimafreundlicher zu gestalten."
+    },
+    "who": {
+      "title": "Wer macht das?",
+      "text": "Das Projekt ist eine Initiative von Hackerbande Nürnberg bestehend aus Leuten wie dir. Wir freuen uns über Unterstützung oder Feedback!"
+    },
+    "go": {
+      "title": "Auf gehts!",
+      "text": "Jetzt schau dich um und erfahre mehr über die Temperaturen in deinem Viertel!"
+    },
+    "cta": "Zur Karte!"
   }
 }
