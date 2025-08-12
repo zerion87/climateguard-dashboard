@@ -98,10 +98,26 @@
     .logo-container {
         display: flex;
         justify-content: center;
+        align-items: center;
+        position: relative;
     }
     .logo-container img {
         max-width: 450px;
         height: auto;
+    }
+    .logo-container select {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: 0;
+        width: 60px;
+        padding: 0.25rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        background-color: white;
+        font-size: 0.875rem;
+        font-weight: 500;
     }
 
     /* --- Content Section --- */
