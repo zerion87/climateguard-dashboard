@@ -1,0 +1,94 @@
+{
+  "meta": {
+    "title": "NuernbergKlima – Bürgerportal",
+    "description": "NuernbergKlima.de – Gemeinsam für ein besseres Stadtklima"
+  },
+  "common": {
+    "logo_alt": "NuernbergKlima Logo"
+  },
+  "nav": {
+    "map": "Karte",
+    "about": "Über Uns",
+    "contact": "Kontakt",
+    "imprint": "Impressum",
+    "menu": "Menü öffnen"
+  },
+  "hero": {
+    "title": "Gemeinsam für ein besseres Stadtklima",
+    "subtitle": "NuernbergKlima.de sammelt und visualisiert Echtzeit-Klimadaten aus Nürnberg. Sieh nach, wo es besonders heiß ist und wo es kühlere Plätze gibt!"
+  },
+  "stats": {
+    "max_today": "höchste Temperatur heute",
+    "sensors_active": "Sensoren aktiv",
+    "max_diff_today": "größter Temperaturunterschied heute",
+    "min_today": "niedrigste Temperatur  heute"
+  },
+  "about": {
+    "title_prefix": "Was macht",
+    "title_suffix": "?",
+    "lead": "Gemeinsam zeigen wir in Echtzeit, wie unterschiedlich sich Hitze in Nürnbergs Südstadt verteilt – offen, verständlich und für alle zugänglich.",
+    "features": {
+      "what": {
+        "title": "Was ist NuernbergKlima.de?",
+        "text": "Mit diesem Projekt möchten wir gemeinsam herausfinden, wie warm (oder kalt) es an verschiedenen Orten in der Südstadt ist."
+      },
+      "why": {
+        "title": "Wieso machen wir das?",
+        "text": "Extreme Hitze betrifft immer mehr Städte. Die Temperatur kann aber sogar innerhalb eines Viertels ganz unterschiedlich sein, z. B. je nachdem, wie viel Grün es gibt oder wie eng die Bebauung ist. Unsere Sensoren messen daher die Temperatur an verschiedenen Standorten. Die Daten werden anonym erfasst und auf unserer Karte in Echtzeit visualisiert."
+      },
+      "data": {
+        "title": "Was passiert mit den Daten?",
+        "text": "Alle Messwerte sind öffentlich einsehbar. So können alle sehen, wo es besonders heiß wird und wo es kühler bleibt. Damit wollen wir sichtbar machen, welche Ecken unseres Viertels besonders mit Hitze zu kämpfen haben – und dabei helfen, gemeinsam Lösungen zu finden, um unsere Nachbarschaft klimafreundlicher zu gestalten."
+      },
+      "who": {
+        "title": "Wer macht das?",
+        "text": "Das Projekt ist eine Initiative von Hackerbande Nürnberg bestehend aus Leuten wie dir. Wir freuen uns über Unterstützung oder Feedback!"
+      }
+    },
+    "note": "Alle Daten sind anonymisiert und frei nutzbar. Hinweise & Ideen sind willkommen."
+  },
+  "sponsors": {
+    "title": "Das Projekt wird im Rahmen von „Was wäre,  wenn...?“ von der Nationalen Stadtentwicklungspolitik durch das Bundesministerium für Wohnen, Stadtentwicklung und Bauwesen (BMWSB) gefördert."
+  },
+  "imprint": {
+    "title": "Impressum",
+    "represented_by": "Vertreten durch:",
+    "contact": "Kontakt:",
+    "responsible": "Verantwortlich für den Inhalt:"
+  },
+  "pages": {
+    "wasistdas": {
+      "meta": {
+        "title": "NuernbergKlima – Was ist das?",
+        "description": "Das Temperatur-Projekt in der Nürnberger Südstadt. Entdecke Live-Klimadaten aus deinem Viertel."
+      }
+    }
+  },
+  "wasistdas": {
+    "title": "Was ist das?",
+    "intro": {
+      "line1": "Willkommen beim Temperatur-Projekt in der Nürnberger Südstadt!",
+      "line2": "Du hast einen unserer Temperatur-Sensoren entdeckt – toll, dass Du neugierig bist!"
+    },
+    "what": {
+      "text": "Mit diesem Projekt möchten wir gemeinsam herausfinden, wie warm (oder kalt) es an verschiedenen Orten in der Südstadt ist."
+    },
+    "why": {
+      "title": "Wieso machen wir das?",
+      "text": "Extreme Hitze betrifft immer mehr Städte. Die Temperatur kann aber sogar innerhalb eines Viertels ganz unterschiedlich sein, z.B. je nachdem, wie viel Grün es gibt oder wie eng die Bebauung ist. Unsere Sensoren messen daher die Temperatur an verschiedenen Standorten. Die Daten werden anonym erfasst und auf unserer Karte in Echtzeit visualisiert."
+    },
+    "data": {
+      "title": "Was passiert mit den Daten?",
+      "text": "Alle Messwerte sind öffentlich einsehbar. So können alle sehen, wo es besonders heiß wird und wo es kühler bleibt. Damit wollen wir sichtbar machen, welche Ecken unseres Viertels besonders mit Hitze zu kämpfen haben – und dabei helfen, gemeinsam Lösungen zu finden, um unsere Nachbarschaft klimafreundlicher zu gestalten."
+    },
+    "who": {
+      "title": "Wer macht das?",
+      "text": "Das Projekt ist eine Initiative von Hackerbande Nürnberg bestehend aus Leuten wie dir. Wir freuen uns über Unterstützung oder Feedback!"
+    },
+    "go": {
+      "title": "Auf gehts!",
+      "text": "Jetzt schau dich um und erfahre mehr über die Temperaturen in deinem Viertel!"
+    },
+    "cta": "Zur Karte!"
+  }
+}
