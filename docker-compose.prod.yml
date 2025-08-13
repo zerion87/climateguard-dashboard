@@ -10,3 +10,19 @@ services:
       - "9443:443"
     environment:
       - NODE_ENV=production
+    depends_on:
+      - counter-api-prod
+    volumes:
+      - ./src/nuernbergklima/nginx.conf:/etc/nginx/conf.d/default.conf
+
+  counter-api-prod:
+    build:
+      context: ./src/counter-api
+      dockerfile: Dockerfile
+    container_name: counter-api-prod
+    restart: always
+    volumes:
+      - counter-data:/data
+
+volumes:
+  counter-data:
