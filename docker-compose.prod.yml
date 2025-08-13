@@ -10,10 +10,9 @@ services:
       - "9443:443"
     environment:
       - NODE_ENV=production
+      - API_HOST=counter-api-prod
     depends_on:
       - counter-api-prod
-    volumes:
-      - ./src/nuernbergklima/nginx.conf:/etc/nginx/conf.d/default.conf
 
   counter-api-prod:
     build:

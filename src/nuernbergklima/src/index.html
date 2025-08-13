@@ -253,7 +253,7 @@
     document.getElementById('year').textContent = new Date().getFullYear();
 
     // --- Visitor Counter ---
-    async function updateVisitorCount() {
+    (async function updateVisitorCount() {
       try {
         // Increment visitor count and get new count in one request
         const response = await fetch('/api/counter/increment', { method: 'POST' });
@@ -274,10 +274,7 @@
           visitorCountElement.textContent = 'N/A';
         }
       }
-    }
-
-    // Update the count when the page loads
-    document.addEventListener('DOMContentLoaded', updateVisitorCount);
+    })();
     // The map initialization is now expected to be in /scripts/map.js
   </script>
 </body>

@@ -10,3 +10,18 @@ services:
       - "9444:443"
     environment:
       - NODE_ENV=test
+      - API_HOST=counter-api-test
+    depends_on:
+      - counter-api-test
+
+  counter-api-test:
+    build:
+      context: ./src/counter-api
+      dockerfile: Dockerfile
+    container_name: counter-api-test
+    restart: always
+    volumes:
+      - counter-data-test:/data
+
+volumes:
+  counter-data-test:
